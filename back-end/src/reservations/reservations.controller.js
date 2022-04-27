@@ -8,6 +8,7 @@ async function reservationExists(req, res, next) {
       const reservation = await service.read(req.body.data.reservation_id)
       if (reservation.reservation_id) {
         res.locals.reservation = reservation
+        console.log("res locals reservation:", res.locals.reservation)
         return next()
       }
       next({ status: 404, message: `Reservation ${reservation.reservation_id} not found.`})

@@ -70,7 +70,18 @@ export async function listReservations(params, signal) {
 
 export async function getReservation(signal, reservation_id) {
   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`)
-  return await fetchJson(url, { headers, signal }, [])
+  try {
+    return await fetchJson(url, 
+      { 
+        method: 'GET', 
+        headers, 
+        signal 
+      }, [])
+  } catch (error) {
+    console.log(error)
+    return error
+  }
+  
 }
 
 /**
