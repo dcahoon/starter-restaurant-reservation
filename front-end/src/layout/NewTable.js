@@ -42,11 +42,13 @@ export default function NewTable() {
             return
         } else {
             setError(null)
+            history.go(-1)
         }
     }
 
-    function handleCancel() {
-        history.push(-1)
+    function handleCancel(event) {
+        event.preventDefault()
+        history.go(-1)
     }
 
     

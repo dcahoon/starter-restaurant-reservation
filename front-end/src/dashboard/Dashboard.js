@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { listReservations, listTables, seatTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
@@ -72,7 +73,18 @@ function Dashboard({ date }) {
 			<td>{reservation.mobile_number}</td>
 			<td>{reservation.reservation_date}</td>
 			<td>{reservation.reservation_time}</td>
-			<td><Link className="btn btn-dark" to={`/reservations/${reservation.reservation_id}/seat`}>Seat</Link></td>
+			<td>{reservation.status}</td>
+			<td>
+				<Link 
+					className="btn btn-dark"
+					disabled={!reservation.status==="Booked"?false:true}
+					data-reservation-id-status={reservation.reservation_id} 
+					to={`/reservations/${reservation.reservation_id}/seat`}
+					reservation={reservation}
+				>
+					Seat
+				</Link>
+			</td>
       	</tr>
   	))
   
@@ -104,7 +116,7 @@ function Dashboard({ date }) {
 			</div>
 			<ErrorAlert error={error} />
 			<div className="row">
-				<div className="col-8 m-0">
+				<div className="col-9 m-0">
 					<table className="table table-striped">
 						<thead className="thead-dark">
 								<th>First Name</th>
@@ -113,12 +125,15 @@ function Dashboard({ date }) {
 								<th>Mobile Number</th>
 								<th>Reservation Date</th>
 								<th>Reservation Time</th>
-								<th></th>
-						</thead>						
-						{reservationsContent}						
+								<th>Status</th>
+								<th>Seat</th>
+						</thead>	
+						<tbody>
+							{reservationsContent}						
+						</tbody>					
 					</table>
 				</div>
-				<div className="col-4 m-0">
+				<div className="col-3 m-0">
 					<table className="table table-striped">
 						<thead className="thead-dark">
 								<th>Table Name</th>
@@ -131,7 +146,7 @@ function Dashboard({ date }) {
 				</div>
 			</div>
 			{/** Modal Window */ }
-			<div className="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div className="modal fade" id="confirmationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 				<div className="modal-dialog" role="document">
 					<div className="modal-content">
 						<div className="modal-header">
@@ -156,3 +171,23 @@ function Dashboard({ date }) {
 }
 
 export default Dashboard;
+
+/**
+ * The /dashboard page will
+	
+	display the status of the reservation. The default status is "booked"
+	
+	X the status text must have a data-reservation-id-status={reservation.reservation_id} attribute, so it can be found by the tests.
+	
+	display the Seat button only when the reservation status is "booked".
+	
+	clicking the Seat button changes the status to "seated" and hides the Seat button.
+	
+	clicking the Finish button associated with the table changes the reservation status to "finished" and removes the reservation from the dashboard.
+	
+	to set the status, PUT to /reservations/:reservation_id/status with a body of {data: { status: "<new-status>" } } where <new-status> is one of booked, seated, or finished. Please note that this is only tested in the back-end for now.
+	
+	Hint You can add a field to a table in a migration up method by defining a new column. E.g. table.string("last_name", null).notNullable(); will create a new last_name column. Be sure to remove the column in the down function using dropColumn(). E.g. table.dropColumn("last_name");
+
+Hint Use Knex.transaction() to make sure the tables and reservations records are always in sync with each other.
+ */

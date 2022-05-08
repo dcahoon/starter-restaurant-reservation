@@ -3,18 +3,18 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 const moment = require("moment") // used to validate date input
 
 async function reservationExists(req, res, next) {
-  if (req.body.data) {
-    if (req.body.data.reservation_id) {
-      const reservation = await service.read(req.body.data.reservation_id)
+  
+    if (req.params.reservation_id) {
+      const reservation = await service.read(req.params.reservation_id)
       if (reservation.reservation_id) {
         res.locals.reservation = reservation
-        console.log("res locals reservation:", res.locals.reservation)
+        
         return next()
       }
       next({ status: 404, message: `Reservation ${reservation.reservation_id} not found.`})
     }
     
-  }
+  
   next({ status: 404, message: `Reservation not found.` })
 }
 
@@ -80,8 +80,6 @@ function hasValidTime(req, res, next) {
       next({ status: 400, message: "Latest reservation time is 9:30 PM."})
     }
 
-    // console.log("res time before open:", resTime.isBefore(openTime))
-    // console.log("reservation time", reservation.reservation_time)
     return next()
   }
   const message = `reservation_time is invalid.`
@@ -126,6 +124,18 @@ async function create(req, res, next) {
   })
 }
 
+async function changeStatusToBooked(req, res, next) {
+  const reservation = res.locals.reservation
+  const updatedReservation = {
+    ...reservation,
+    status: "Booked",
+  }
+  const data = await service.update(updatedReservation)
+  res.json({ data })
+}
+
+
+
 
 
 module.exports = {
@@ -147,5 +157,8 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(read)
   ],
-  //update: [asyncErrorBoundary(hasData), asyncErrorBoundary(update)]
+  changeStatusToBooked: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(changeStatusToBooked),
+  ],
 }

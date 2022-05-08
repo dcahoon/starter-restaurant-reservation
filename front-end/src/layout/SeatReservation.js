@@ -5,36 +5,21 @@ const { listTables, getReservation, seatTable } = require("../utils/api")
 
 export default function SeatReservation() {
     
-    const [tables, setTables] = useState([])
-    const [tableBeingAssigned, setTableBeingAssigned] = useState(null)
+    /**
     const [reservation, setReservation] = useState({})
-    const [error, setError] = useState(null)
-
-    const history = useHistory()
     const { reservation_id } = useParams()
-
-    const handleChange = ({ target: {value} }) => {
-        setTableBeingAssigned(tables.find(({ table_id }) => table_id == value))
-    }
-
-    function handleCancel(event) {
-        event.preventDefault()
-        history.go(-1)
-    }
-
+    
     async function handleSubmit(event) {  
         event.preventDefault()
-        console.log("reservationid:", reservation_id)
         const abortController = new AbortController()
-        if (event.target.value) {
-            setError({ message: "Please select a table." })
-            return
-        }
+        
         try {
+            console.log("reservation id", reservation_id)
             const response = await getReservation(abortController.signal, reservation_id)
+            console.log("response", response)
             const reservationFromApi = await response
-            console.log("reservationFromApi:", reservationFromApi)
             setReservation(reservationFromApi)
+            console.log("reservation", reservation)
             if (reservation.people > tableBeingAssigned.capacity) {
                 setError({ message: "Table isn't big enough for party." })
                 return
@@ -61,10 +46,41 @@ export default function SeatReservation() {
             setError("Table not found.")
         }
     }
+    */
+
+    const [error, setError] = useState(null)
+    const [tables, setTables] = useState([])
+    const [tableBeingSeated, setTableBeingSeated] = useState(null)
     
-    /**
-     * Loads tables from API
-     */
+    const { reservation_id } = useParams()
+    const history = useHistory()
+
+    async function handleSubmit(event) {
+        
+        event.preventDefault()
+        const abortController = new AbortController()
+        const reservation = await getReservation(abortController.signal, reservation_id)
+       
+        //console.log("reservation", reservation)
+        
+        // call the API to seat the table
+
+        // seatTable(unseat, reservationId, tableId, signal)
+        
+    }
+
+    const handleChange = ({ target }) => {
+        setTableBeingSeated(target.value)
+        setError(null)
+        console.log("table being seated", tableBeingSeated)
+    }
+
+    async function handleCancel(event) {
+        event.preventDefault()
+        history.go(-1)
+    }
+
+    /** Loads tables from API */
     useEffect(() => {
         const abortController = new AbortController()
         setError(null)
@@ -81,15 +97,15 @@ export default function SeatReservation() {
             }
             loadTablesFromApi()
     }, [])
-        
+    
     // Map out tables from API to populate select
     const content = tables.map((table, index) => (
-        <option key={index} value={`${table.table_id}`}> {`${table.table_name} - ${table.capacity}`} </option>
+        <option key={index} value={table}> {`${table.table_name} - ${table.capacity}`} </option>
     ))
 
     return (
         <div>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label>
                     Tables:
                     <select id="table-select" name="table_id" onChange={handleChange}>
@@ -97,7 +113,7 @@ export default function SeatReservation() {
                         {content}
                     </select>
                 </label>
-                <button type="submit" onClick={handleSubmit} className="btn btn-primary">
+                <button type="submit" className="btn btn-primary">
                     Submit
                 </button>
                 <button onClick={handleCancel} className="btn btn-primary">

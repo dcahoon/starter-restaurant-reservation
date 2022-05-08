@@ -78,7 +78,7 @@ export async function getReservation(signal, reservation_id) {
         signal 
       }, [])
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return error
   }
   
@@ -156,20 +156,22 @@ export async function seatTable(unseat, reservationId, tableId, signal) {
       console.error(error)
       return error
     }
+  } else {
+    try {
+      const response = await fetchJson(url, {
+        method: 'PUT',
+        headers,
+        signal,
+        body: JSON.stringify({ data: { reservation_id: reservationId } })
+      }, [])
+      return response
+    } catch (error) {
+      console.error(error)
+      return error
+    }
+
   }
   
-  try {
-    const response = await fetchJson(url, {
-      method: 'PUT',
-      headers,
-      signal,
-      body: JSON.stringify({ data: { reservation_id: reservationId } })
-    }, [])
-    return response
-  } catch (error) {
-    console.error(error)
-    return error
-  }
 
 }
 

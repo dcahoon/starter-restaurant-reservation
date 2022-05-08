@@ -1,5 +1,5 @@
 const service = require("./tables.service")
-const resService = require("../reservations/reservations.service")
+const reservationService = require("../reservations/reservations.service")
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 
 async function hasData(req, res, next) {
@@ -12,7 +12,7 @@ async function hasData(req, res, next) {
 }
 
 async function create(req, res, next) {
-    const tableFromRequest = req.body.data
+    
     const newTable = await service.create(req.body.data)
     res.status(201)
         .json({
@@ -36,15 +36,6 @@ function tableCapacityValid(req, res, next) {
     return next()
 }
 
-async function reservationExists(req, res, next) {
-    const reservation = await resService.read(req.body.data.reservation_id)
-    if (!reservation) {
-        next({ status: 404, message: `Reservation not found.` })
-    }
-    res.locals.reservation = reservation
-    return next()
-}
-
 async function tableExists(req, res, next) {
     const table = await service.read(req.params.table_id)
     if (!table) {
@@ -62,36 +53,69 @@ async function list(req, res, next) {
 
 async function seatTable(req, res, next) {
     
-    // Check for table capacity
-    if (Number.parseInt(res.locals.table.capacity) < Number.parseInt(res.locals.reservation.people)) {
-        next({ status: 400, message: `Table capacity too small to seat reservation.`})
+    // if table is already seated, return message
+    if (res.locals.table.reservation_id !== null) {
+        next({ status: 400, message: `Table is occupied` })
     }
-    if (res.locals.table.reservation_id) {
-        next({ status: 400, message: `Table is occupied.` })
+
+    // find reservation
+    const reservation = await reservationService.read(req.body.data.reservation_id)
+
+    // if reservation is already seated, return error
+    if (reservation.status === "Seated") {
+        next({ status: 400, message: `Reservation is already seated` })
     }
+
+    // check capacity and return message if too small
+    if (res.locals.table.capacity < reservation.people) {
+        next({ status: 400, message: `Table capacity too small for reservation` })
+    }
+
+    // seat the table
     const updatedTable = {
         ...res.locals.table,
-        reservation_id: req.body.data.reservation_id,
+        reservation_id: reservation.reservation_id,
     }
     const data = await service.update(updatedTable)
+
+    // update reservation status to "Seated"
+    const updatedReservation = {
+        ...reservation,
+        status: "Seated",
+    }
+    const newReservation = await reservationService.update(updatedReservation)
+    // console.log("new reservation", newReservation)
+
     res.json({ data })
 
 }
 
 async function finishTable(req, res, next) {
     
-    if (res.locals.table.reservation_id) {
-        const updatedTable = {
-            ...res.locals.table,
-            reservation_id: null,
-        }
-        const data = await service.update(updatedTable)
-        res.json({ data })
-
-    } else {
-        next({ message: `Table not currently seated.`})
+    // if table isn't seated, return
+    if (res.locals.table.reservation_id === null) {
+        next ({ status: 400, message: `Table not currently seated` })
     }
 
+    // unseat the table
+    const updatedTable = {
+        ...res.locals.table,
+        reservation_id: null,
+    }
+    const data = await service.update(updatedTable)
+
+    // find reservation
+    const reservation = await reservationService.read(res.locals.table.reservation_id)
+        
+    // update reservation status
+    const updatedReservation = {
+        ...reservation,
+        status: "Finished"
+    }
+
+    const newReservation = await reservationService.update(updatedReservation)
+
+    res.json({ data })
 }
 
 module.exports = {
@@ -103,7 +127,6 @@ module.exports = {
     ],
     seatTable: [
         asyncErrorBoundary(tableExists), 
-        asyncErrorBoundary(reservationExists),
         asyncErrorBoundary(seatTable)
     ],
     list,
