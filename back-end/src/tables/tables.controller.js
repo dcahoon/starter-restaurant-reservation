@@ -61,6 +61,11 @@ async function seatTable(req, res, next) {
     // find reservation
     const reservation = await reservationService.read(req.body.data.reservation_id)
 
+    // Return a message if the reservation isn't found
+    if (!reservation) {
+        next({ status: 400, message: `Reservation ${req.body.data.reservation_id} not found`})
+    }
+
     // if reservation is already seated, return error
     if (reservation.status === "Seated") {
         next({ status: 400, message: `Reservation is already seated` })
@@ -76,7 +81,8 @@ async function seatTable(req, res, next) {
         ...res.locals.table,
         reservation_id: reservation.reservation_id,
     }
-    const data = await service.update(updatedTable)
+
+    //const data = await service.update(updatedTable)
 
     // update reservation status to "Seated"
     const updatedReservation = {
@@ -84,9 +90,10 @@ async function seatTable(req, res, next) {
         status: "Seated",
     }
     const newReservation = await reservationService.update(updatedReservation)
-    // console.log("new reservation", newReservation)
 
-    res.json({ data })
+    service.seatTable(updatedTable, updatedReservation)
+
+    res.json({ message: `table seated` })
 
 }
 

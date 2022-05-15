@@ -25,11 +25,38 @@ function update(updatedTable) {
         .update(updatedTable, "*")
 }
 
+async function seatTable(updatedTable, updatedReservation) {
+    
+    return knex.transaction(trx => {
+        
+        try {
+
+            const table = await trx('tables')
+                .where({ table_name: updatedTable.table_name })
+                .update(updatedTable, "*")
+                .returning("*")
+            const reservation = await trx('reservations')
+                .where({ reservation_id: updatedReservation.reservation_id })
+                .update(updatedReservation, "*")
+            //throw new Error()
+            trx.commit()
+            return table
+        } catch (error) {
+            trx.rollback()
+        }
+
+    })
+    
+    
+
+}
+
 module.exports = {
     create,
     list,
     update,
     read,
+    seatTable,
 }
 
 // when selecting, always returns an array

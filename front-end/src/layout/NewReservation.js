@@ -21,7 +21,7 @@ export default function NewReservation() {
         first_name: "Reggie",
         last_name: "Farnquist",
         mobile_number: "517-555-5555",
-        reservation_date: "2022-03-28",
+        reservation_date: "2022-05-11",
         reservation_time: "12:00",
         people: 4,
         status: "Booked",
