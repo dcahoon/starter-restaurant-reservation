@@ -14,24 +14,25 @@ async function hasData(req, res, next) {
 async function create(req, res, next) {
     
     const newTable = await service.create(req.body.data)
-    res.status(201)
-        .json({
-            data: newTable,
-        })
+    res.status(201).json({ data: newTable })
 }
 
 function tableNameValid(req, res, next) {
+    if (!res.locals.table.table_name) {
+        next({ status: 400, message: `table_name required` })
+    }
     if (res.locals.table.table_name.length < 2) {
-        const message = `Table name must be 2 or more characters.`
-        next({ status: 400, message })
+        next({ status: 400, message: `table_name must be 2 or more characters` })
     }
     return next()
 }
 
 function tableCapacityValid(req, res, next) {
     if (!res.locals.table.capacity) {
-        const message = `Capacity must not be blank.`
-        next ({ status: 400, message })
+        next ({ status: 400, message: `capacity must not be blank.` })
+    }
+    if (typeof res.locals.table.capacity !== 'number') {
+        next({ status: 400, message: `Table capacity must be a number` })
     }
     return next()
 }
@@ -53,17 +54,22 @@ async function list(req, res, next) {
 
 async function seatTable(req, res, next) {
     
+    if (!req.body.data.reservation_id) {
+        next({ status: 400, message: `reservation_id missing` })
+    }
+
     // if table is already seated, return message
     if (res.locals.table.reservation_id !== null) {
         next({ status: 400, message: `Table is occupied` })
     }
 
     // find reservation
-    const reservation = await reservationService.read(req.body.data.reservation_id)
+    const reservationId = req.body.data.reservation_id
+    const reservation = await reservationService.read(reservationId)
 
     // Return a message if the reservation isn't found
     if (!reservation) {
-        next({ status: 400, message: `Reservation ${req.body.data.reservation_id} not found`})
+        next({ status: 404, message: `Reservation ${req.body.data.reservation_id} not found`})
     }
 
     // if reservation is already seated, return error
@@ -91,9 +97,9 @@ async function seatTable(req, res, next) {
     }
     const newReservation = await reservationService.update(updatedReservation)
 
-    service.seatTable(updatedTable, updatedReservation)
+    const returnedTable = await service.seatTable(updatedTable, updatedReservation)
 
-    res.json({ message: `table seated` })
+    next({ status: 200, message: `table seated` })
 
 }
 
@@ -133,6 +139,7 @@ module.exports = {
         asyncErrorBoundary(create)
     ],
     seatTable: [
+        asyncErrorBoundary(hasData),
         asyncErrorBoundary(tableExists), 
         asyncErrorBoundary(seatTable)
     ],

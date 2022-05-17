@@ -17,6 +17,7 @@ function read(tableId) {
 function list() {
     return knex("tables")
         .select("*")
+        .orderBy(table_name)
 }
 
 function update(updatedTable) {
@@ -28,9 +29,19 @@ function update(updatedTable) {
 async function seatTable(updatedTable, updatedReservation) {
     
     return knex.transaction(trx => {
+        trx('tables')
+            .where({ table_name: updatedTable.table_name })
+            .update(updatedTable, "*")
+            .returning("*")
+            .catch(trx.rollback())
+        trx('reservations')
+            .where({ reservation_id: updatedReservation.reservation_id})
+            .update(updatedReservation, "*")
+            .catch(trx.rollback())
+        trx.commit()
+        return updatedTable
         
-        try {
-
+        /* try {
             const table = await trx('tables')
                 .where({ table_name: updatedTable.table_name })
                 .update(updatedTable, "*")
@@ -43,8 +54,7 @@ async function seatTable(updatedTable, updatedReservation) {
             return table
         } catch (error) {
             trx.rollback()
-        }
-
+        } */
     })
     
     

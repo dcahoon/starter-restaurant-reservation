@@ -3,19 +3,17 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 const moment = require("moment") // used to validate date input
 
 async function reservationExists(req, res, next) {
-  
-    if (req.params.reservation_id) {
-      const reservation = await service.read(req.params.reservation_id)
-      if (reservation.reservation_id) {
-        res.locals.reservation = reservation
-        
-        return next()
-      }
-      next({ status: 404, message: `Reservation ${reservation.reservation_id} not found.`})
+  try {
+    const reservation = await service.read(req.params.reservation_id)
+    if (reservation) {
+      res.locals.reservation = reservation
+      next()
+    } else {
+      next({ status: 404, message: `Reservation ${req.params.reservation_id} not found` })
     }
-    
-  
-  next({ status: 404, message: `Reservation not found.` })
+  } catch (error) {
+    next({ status: 404, message: error.message })
+  }
 }
 
 async function hasData(req, res, next) {
@@ -88,7 +86,12 @@ function hasValidTime(req, res, next) {
 
 function hasValidPeople(req, res, next) {
   const reservation = res.locals.reservation
-  if ( reservation.people <= 0 ) {
+  if (typeof reservation.people === 'string') {
+    next({ status: 400, message: `people must be an integer` })
+  }
+  if (!reservation.people) {
+    next({ status: 400, message: `people must not be null or undefined `})
+  } else if ( reservation.people <= 0 ) {
     const message = `Property 'people' must be an integer greater than 0.`
     next({ status: 400, message: message })
   } else if (reservation.people === "" || isNaN(reservation.people)) {
@@ -101,7 +104,7 @@ function hasValidPeople(req, res, next) {
 
 async function read(req, res, next) {
   const reservation = res.locals.reservation
-  res.status(201).json({
+  res.status(200).json({
     data: reservation,
   })
 }

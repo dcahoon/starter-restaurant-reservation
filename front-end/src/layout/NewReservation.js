@@ -17,13 +17,21 @@ export default function NewReservation() {
         people: false,
     })
 
+   /*  await page.type("input[name=first_name]", "James");
+      await page.type("input[name=last_name]", lastName);
+      await page.type("input[name=mobile_number]", "800-555-1212");
+      await page.type("input[name=reservation_date]", "01012035");
+      await page.type("input[name=reservation_time]", "1330");
+      await page.type("input[name=people]", "2"); */
+    const lastName = Date.now().toString(10);
+
     const initialFormData = {
-        first_name: "Reggie",
-        last_name: "Farnquist",
-        mobile_number: "517-555-5555",
-        reservation_date: "2022-05-11",
-        reservation_time: "12:00",
-        people: 4,
+        first_name: "",
+        last_name: "",
+        mobile_number: "",
+        reservation_date: "",
+        reservation_time: "",
+        people: null,
         status: "Booked",
     }
 
@@ -31,6 +39,15 @@ export default function NewReservation() {
     const [error, setError] = useState(null)
 
     const handleChange = ({ target }) => {
+        
+        //setInputValid({ ...inputValid, [target.name]: !target.value })
+
+        //target.name === "people" ? Number(target.value) : target.value
+
+        setFormData({
+            ...formData,
+            [target.name]: target.name === "people" ? Number(target.value) : target.value,
+        })
         /**
          * add logic/switch to handle validation based on target
          */
@@ -45,12 +62,6 @@ export default function NewReservation() {
                     setInputValid(inputValid.last_name = false)
                 }
         } */
-
-        //setInputValid({ ...inputValid, [target.name]: !target.value })
-        setFormData({
-            ...formData,
-            [target.name]: target.value,
-        })
     }
 
     const handleReset = () => {
@@ -71,12 +82,16 @@ export default function NewReservation() {
         } */
         const abortController = new AbortController()
         const newReservation = { ...formData }
-        const response = await createReservation(newReservation, abortController.signal)
-        if (response.message) {
-            setError(response)
-            return
+        try {
+            const response = await createReservation(newReservation, abortController.signal)
+            if (response.message) {
+                setError(response)
+                return
+            }
+            history.push(`/dashboard/?date=${formData.reservation_date}`)
+        } catch (error) {
+            setError(error.message)
         }
-        history.push(`/dashboard/?date=${formData.reservation_date}`)
     }
 
     function handleCancel() {
