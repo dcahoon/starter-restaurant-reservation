@@ -17,7 +17,7 @@ function read(tableId) {
 function list() {
     return knex("tables")
         .select("*")
-        .orderBy(table_name)
+        .orderBy("table_name")
 }
 
 function update(updatedTable) {
@@ -28,36 +28,44 @@ function update(updatedTable) {
 
 async function seatTable(updatedTable, updatedReservation) {
     
-    return knex.transaction(trx => {
-        trx('tables')
-            .where({ table_name: updatedTable.table_name })
-            .update(updatedTable, "*")
-            .returning("*")
-            .catch(trx.rollback())
-        trx('reservations')
-            .where({ reservation_id: updatedReservation.reservation_id})
-            .update(updatedReservation, "*")
-            .catch(trx.rollback())
-        trx.commit()
-        return updatedTable
+    knex.transaction(async trx => {
         
-        /* try {
-            const table = await trx('tables')
+        try {
+            
+            await trx('tables')
                 .where({ table_name: updatedTable.table_name })
                 .update(updatedTable, "*")
                 .returning("*")
-            const reservation = await trx('reservations')
-                .where({ reservation_id: updatedReservation.reservation_id })
+            
+            await trx('reservations')
+                .where({ reservation_id: updatedReservation.reservation_id})
                 .update(updatedReservation, "*")
-            //throw new Error()
-            trx.commit()
-            return table
+            
+            await trx.commit()
+            
         } catch (error) {
-            trx.rollback()
-        } */
+            await trx.rollback()
+        }
+
     })
     
-    
+    /* knex.transaction(function(t) {
+        knex('foo')
+        .transacting(t)
+        .insert({id:"asdfk", username:"barry", email:"barry@bar.com"})
+        .then(function() {
+            knex('foo')
+            .where('username','=','bob')
+            .update({email:"bob@foo.com"})
+            .then(t.commit, t.rollback)
+        })
+     })
+     .then(function() {
+      // it worked
+     },
+     function() {
+      // it failed
+     }); */
 
 }
 

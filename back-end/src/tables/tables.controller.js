@@ -53,14 +53,13 @@ async function list(req, res, next) {
 }
 
 async function seatTable(req, res, next) {
-    
-    if (!req.body.data.reservation_id) {
-        next({ status: 400, message: `reservation_id missing` })
-    }
 
+    if (!req.body.data.reservation_id) {
+        return next({ status: 400, message: `reservation_id missing` })
+    }
     // if table is already seated, return message
     if (res.locals.table.reservation_id !== null) {
-        next({ status: 400, message: `Table is occupied` })
+        return next({ status: 400, message: `Table is occupied` })
     }
 
     // find reservation
@@ -69,17 +68,15 @@ async function seatTable(req, res, next) {
 
     // Return a message if the reservation isn't found
     if (!reservation) {
-        next({ status: 404, message: `Reservation ${req.body.data.reservation_id} not found`})
+        return next({ status: 404, message: `Reservation ${req.body.data.reservation_id} not found`})
     }
-
     // if reservation is already seated, return error
     if (reservation.status === "Seated") {
-        next({ status: 400, message: `Reservation is already seated` })
+        return next({ status: 400, message: `Reservation is already seated` })
     }
-
     // check capacity and return message if too small
     if (res.locals.table.capacity < reservation.people) {
-        next({ status: 400, message: `Table capacity too small for reservation` })
+        return next({ status: 400, message: `Table capacity too small for reservation` })
     }
 
     // seat the table
@@ -87,8 +84,6 @@ async function seatTable(req, res, next) {
         ...res.locals.table,
         reservation_id: reservation.reservation_id,
     }
-
-    //const data = await service.update(updatedTable)
 
     // update reservation status to "Seated"
     const updatedReservation = {
@@ -99,7 +94,7 @@ async function seatTable(req, res, next) {
 
     const returnedTable = await service.seatTable(updatedTable, updatedReservation)
 
-    next({ status: 200, message: `table seated` })
+    res.sendStatus(200)
 
 }
 
