@@ -5,24 +5,27 @@ import ErrorAlert from "./ErrorAlert"
 
 export default function NewTable() {
     // form with table name at least 2 characters and capacity 
-    //which must be at least 1
+    // which must be at least 1
 
     const history = useHistory()
 
     const initialFormData = {
         table_name: "",
-        capacity: null
+        capacity: null,
     }
 
     const [tables, setTables] = useState([])
     const [error, setError] = useState(null)
     const [formData, setFormData] = useState({ ...initialFormData })
 
+
     const handleChange = ({ target }) => {
+        
         setFormData({
             ...formData,
             [target.name]: target.value,
         })
+
     }
 
     async function handleSubmit(event) {
@@ -30,19 +33,29 @@ export default function NewTable() {
         
         // validate input
         if (formData.table_name.length < 2) {
-            setError({ message: `Table name must be at least 2 characters.` })
+            setError({ message: `Table name must be at least 2 characters` })
             return
         }
 
+console.log("capacity", formData.capacity)
+
+        if (typeof parseInt(formData.capacity) !== "number") {
+            setError({ message: `Table capacity must be a numberrrrrr` })
+        }
+
         const abortController = new AbortController()
-        const newTable = { ...formData }
-        const response = await createTable(newTable, abortController.signal)
-        if (response.message) {
-            setError(response)
-            return
-        } else {
-            setError(null)
+        const newTable = { ...formData, capacity: parseInt(formData.capacity) }
+        
+        try {
+            const response = await createTable(newTable, abortController.signal)
+            
+            if (response.message) {
+                setError(response)
+                return
+            }
             history.go(-1)
+        } catch (error) {
+            setError(error.message)
         }
     }
 
@@ -51,9 +64,6 @@ export default function NewTable() {
         history.go(-1)
     }
 
-    
-
-    
 
     return (
         <div>
@@ -76,7 +86,7 @@ export default function NewTable() {
                     <input
                         id="capacity"
                         className="form-control"
-                        type="number"
+                        type="text"
                         name="capacity"
                         onChange={handleChange}
                         value={formData.capacity}
@@ -87,12 +97,15 @@ export default function NewTable() {
                 </div>
                 <ErrorAlert error={error} />
                 <label htmlFor="submit">
-                    <input 
+                    <button
                         type="submit"
                         id="submit"
                         name="submit"
                         className="btn btn-primary"
-                    />
+                        onClick={handleSubmit}
+                    >
+                        Submit
+                    </button>
                 </label>
                 <label htmlFor="cancel">
                     <button 

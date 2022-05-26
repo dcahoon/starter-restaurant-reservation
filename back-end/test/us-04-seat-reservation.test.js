@@ -184,7 +184,6 @@ describe("US-04 - Seat reservation", () => {
 
     beforeEach(async () => {
       barTableOne = await knex("tables").where("table_name", "Bar #1").first();
-      console.log("bar table 1", barTableOne)
       tableOne = await knex("tables").where("table_name", "#1").first();
     });
 
@@ -270,7 +269,6 @@ describe("US-04 - Seat reservation", () => {
           .put(`/tables/${tableOne.table_id}/seat`)
           .set("Accept", "application/json")
           .send({ data: { reservation_id: 2 } });
-
         expect(doubleAssignResponse.body.error).toContain("occupied");
         expect(doubleAssignResponse.status).toBe(400);
       });

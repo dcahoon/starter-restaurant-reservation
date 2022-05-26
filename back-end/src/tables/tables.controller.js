@@ -57,11 +57,12 @@ async function seatTable(req, res, next) {
     if (!req.body.data.reservation_id) {
         return next({ status: 400, message: `reservation_id missing` })
     }
+    //console.log("res locals table", res.locals.table)
     // if table is already seated, return message
     if (res.locals.table.reservation_id !== null) {
         return next({ status: 400, message: `Table is occupied` })
     }
-
+    //console.log("step2")
     // find reservation
     const reservationId = req.body.data.reservation_id
     const reservation = await reservationService.read(reservationId)
@@ -70,6 +71,7 @@ async function seatTable(req, res, next) {
     if (!reservation) {
         return next({ status: 404, message: `Reservation ${req.body.data.reservation_id} not found`})
     }
+    //console.log("step3")
     // if reservation is already seated, return error
     if (reservation.status === "Seated") {
         return next({ status: 400, message: `Reservation is already seated` })
@@ -78,7 +80,7 @@ async function seatTable(req, res, next) {
     if (res.locals.table.capacity < reservation.people) {
         return next({ status: 400, message: `Table capacity too small for reservation` })
     }
-
+    //console.log("step4")
     // seat the table
     const updatedTable = {
         ...res.locals.table,
@@ -90,11 +92,18 @@ async function seatTable(req, res, next) {
         ...reservation,
         status: "Seated",
     }
-    const newReservation = await reservationService.update(updatedReservation)
-
-    const returnedTable = await service.seatTable(updatedTable, updatedReservation)
-
-    res.sendStatus(200)
+    //console.log("step5")
+    try {
+        //const newReservation = await reservationService.update(updatedReservation)
+        const data = await service.seatTable(updatedTable, updatedReservation)
+        
+        await res.json({ data })
+        console.log("data in controller", data)
+    } catch (error) {
+        return next({ status: 400, message: `Error seating table` })
+    }
+    //console.log("step6")
+    return next({ status: 200, message: "nothing caught it!" })
 
 }
 

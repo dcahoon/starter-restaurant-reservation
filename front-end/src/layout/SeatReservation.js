@@ -50,27 +50,45 @@ export default function SeatReservation() {
 
     const [error, setError] = useState(null)
     const [tables, setTables] = useState([])
-    const [tableBeingSeated, setTableBeingSeated] = useState(null)
+    const [tableBeingSeated, setTableBeingSeated] = useState({})
     
     const { reservation_id } = useParams()
     const history = useHistory()
 
     async function handleSubmit(event) {
         
+        /* event.preventDefault()
+        const abortController = new AbortController()
+        
+        try {
+            // seatTable(unseat, reservationId, tableId, signal)  
+            const response = await seatTable(false, reservation_id, tableBeingSeated, abortController.signal)
+            
+        } catch (error) {
+            setError(error)
+        }
+        return */
+
         event.preventDefault()
         const abortController = new AbortController()
-        const reservation = await getReservation(abortController.signal, reservation_id)
-       
-        //console.log("reservation", reservation)
-        
-        // call the API to seat the table
 
-        // seatTable(unseat, reservationId, tableId, signal)
-        
+        try {
+            const response = await seatTable(false, reservation_id, tableBeingSeated, abortController.signal)
+            if (response.message) {
+                setError(response)
+                return
+            } else {
+                history.go(-1)
+            }
+        } catch (error) {
+            setError(error.message)
+        }
+
     }
 
     const handleChange = ({ target }) => {
         setTableBeingSeated(target.value)
+        console.log("target value", target.value)
         setError(null)
         console.log("table being seated", tableBeingSeated)
     }
@@ -100,7 +118,7 @@ export default function SeatReservation() {
     
     // Map out tables from API to populate select
     const content = tables.map((table, index) => (
-        <option key={index} value={table}> {`${table.table_name} - ${table.capacity}`} </option>
+        <option key={index} value={table.table_id}> {`${table.table_name} - ${table.capacity}`} </option>
     ))
 
     return (
