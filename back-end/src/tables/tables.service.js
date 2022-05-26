@@ -27,28 +27,33 @@ function update(updatedTable) {
 }
 
 async function seatTable(updatedTable, updatedReservation) {
-    
-    return knex.transaction(async trx => {
-        
-        try {
-            const table = await trx('tables')
+
+    const responseTable = {}
+
+    try {
+
+        await knex.transaction(async trx => {
+
+            responseTable = await knex('tables')
                 .where({ table_name: updatedTable.table_name })
                 .update(updatedTable, "*")
                 .returning("*")
-            
-            const reservation = await trx('reservations')
-                .where({ reservation_id: updatedReservation.reservation_id})
-                .update(updatedReservation, "*")
-            
-            return await trx.commit()
-            
-            
-        } catch (error) {
-            await trx.rollback()
-            
-        }
+                .transacting(trx)
 
-    })
+            const reservation = await knex('reservations')
+                .where({ reservation_id: updatedReservation.reservation_id })
+                .update(updatedReservation, "*")
+                .transacting(trx)
+            console.log(reservation)
+
+        })
+
+    } catch (error) {
+        console.error(error)
+    }
+
+    return responseTable
+
 }
 
 module.exports = {
