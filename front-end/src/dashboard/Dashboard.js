@@ -29,7 +29,7 @@ function Dashboard({ date }) {
 	}
 
 	
-	useEffect(loadDashboard, [date]);
+	useEffect(loadDashboard, [date, tables]);
 
 	function loadDashboard() {
 		const abortController = new AbortController();
@@ -92,10 +92,10 @@ function Dashboard({ date }) {
 		<tr key={index}>
 			<td>{table.table_name}</td>
 			<td>{table.capacity}</td>
-			{ table.reservation_id ? <td className="text-danger">Occupied</td> : <td className="text-success">Open</td> }
+			{ table.reservation_id ? <td className="text-danger">occupied</td> : <td className="text-success">free</td> }
 			<td>
 				<button 
-					data-table-id-finish={table.table_id} 
+					data-table-id-finish={table.table_id}
 					id={table.table_id} 
 					className="btn btn-primary" 
 					data-toggle="modal" 
@@ -156,7 +156,7 @@ function Dashboard({ date }) {
 							</button>
 						</div>
 						<div className="modal-body">
-							Are you sure you would like to finish this reservation?
+							Is this table ready to seat new guests? This cannot be undone.
 						</div>
 					<div className="modal-footer">
 						<button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -171,23 +171,3 @@ function Dashboard({ date }) {
 }
 
 export default Dashboard;
-
-/**
- * The /dashboard page will
-	
-	display the status of the reservation. The default status is "booked"
-	
-	X the status text must have a data-reservation-id-status={reservation.reservation_id} attribute, so it can be found by the tests.
-	
-	display the Seat button only when the reservation status is "booked".
-	
-	clicking the Seat button changes the status to "seated" and hides the Seat button.
-	
-	clicking the Finish button associated with the table changes the reservation status to "finished" and removes the reservation from the dashboard.
-	
-	to set the status, PUT to /reservations/:reservation_id/status with a body of {data: { status: "<new-status>" } } where <new-status> is one of booked, seated, or finished. Please note that this is only tested in the back-end for now.
-	
-	Hint You can add a field to a table in a migration up method by defining a new column. E.g. table.string("last_name", null).notNullable(); will create a new last_name column. Be sure to remove the column in the down function using dropColumn(). E.g. table.dropColumn("last_name");
-
-Hint Use Knex.transaction() to make sure the tables and reservations records are always in sync with each other.
- */

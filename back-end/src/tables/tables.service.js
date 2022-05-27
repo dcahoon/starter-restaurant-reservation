@@ -28,7 +28,7 @@ function update(updatedTable) {
 
 async function seatTable(updatedTable, updatedReservation) {
 
-    const responseTable = {}
+    let responseTable = {}
 
     try {
 
@@ -44,7 +44,6 @@ async function seatTable(updatedTable, updatedReservation) {
                 .where({ reservation_id: updatedReservation.reservation_id })
                 .update(updatedReservation, "*")
                 .transacting(trx)
-            console.log(reservation)
 
         })
 

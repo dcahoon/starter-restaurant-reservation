@@ -40,7 +40,7 @@ function tableCapacityValid(req, res, next) {
 async function tableExists(req, res, next) {
     const table = await service.read(req.params.table_id)
     if (!table) {
-        next({ status: 404, message: `Table not found` })
+        next({ status: 404, message: `Table ${req.params.table_id} not found` })
         return next()
     }
     res.locals.table = table
@@ -111,7 +111,7 @@ async function finishTable(req, res, next) {
     
     // if table isn't seated, return
     if (res.locals.table.reservation_id === null) {
-        next ({ status: 400, message: `Table not currently seated` })
+        next ({ status: 400, message: `Table currently not occupied` })
     }
 
     // unseat the table
