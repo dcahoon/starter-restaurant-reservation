@@ -72,8 +72,12 @@ describe("US-05 - Finish an occupied table - E2E", () => {
 
       expect(containsOccupied).toBe(true);
 
+console.log("containsOccupied in test 5", containsOccupied)
+
       const finishButtonSelector = `[data-table-id-finish="${table.table_id}"]`;
       await page.waitForSelector(finishButtonSelector);
+
+console.log("finish button selector", finishButtonSelector)
 
       page.on("dialog", async (dialog) => {
         expect(dialog.message()).toContain(
@@ -82,9 +86,12 @@ describe("US-05 - Finish an occupied table - E2E", () => {
         await dialog.accept();
       });
 
+console.log("page.on passed")
+
       await page.click(finishButtonSelector);
 
       await page.waitForResponse((response) => {
+console.log("response url", response.url)
         return response.url().endsWith(`/tables`);
       });
 
@@ -98,6 +105,8 @@ describe("US-05 - Finish an occupied table - E2E", () => {
         `[data-table-id-status="${table.table_id}"]`,
         "free"
       );
+
+console.log("contains free (should be true)", containsFree)
 
       expect(containsFree).toBe(true);
     });

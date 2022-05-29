@@ -56,6 +56,7 @@ function Dashboard({ date }) {
     }, [])
 
 	async function unseatTable({ target }) {
+		
 		const abortController = new AbortController()
         try {
 			const response = await seatTable(true, null, `${modalTable}`, abortController.signal)
@@ -177,7 +178,7 @@ function Dashboard({ date }) {
 						</div>
 					<div className="modal-footer">
 						<button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button type="button" className="btn btn-primary" onClick={unseatTable} data-dismiss="modal">Finish</button>
+						<button type="button" className="btn btn-primary" onClick={unseatTable} data-dismiss="modal">OK</button>
 					</div>
 					</div>
 				</div>
