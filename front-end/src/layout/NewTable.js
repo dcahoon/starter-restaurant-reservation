@@ -37,10 +37,8 @@ export default function NewTable() {
             return
         }
 
-console.log("capacity", formData.capacity)
-
         if (typeof parseInt(formData.capacity) !== "number") {
-            setError({ message: `Table capacity must be a numberrrrrr` })
+            setError({ message: `Table capacity must be a number` })
         }
 
         const abortController = new AbortController()
@@ -53,7 +51,7 @@ console.log("capacity", formData.capacity)
                 setError(response)
                 return
             }
-            history.go(-1)
+            history.push(`/dashboard/?date=${formData.reservation_date}`)
         } catch (error) {
             setError(error.message)
         }

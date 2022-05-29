@@ -15,7 +15,7 @@ function Dashboard({ date }) {
 	const [reservations, setReservations] = useState([]);
 	const [tables, setTables] = useState([])
 	const [error, setError] = useState(null)
-	const [trigger, setTrigger] = useState(true)
+	//const [trigger, setTrigger] = useState(true)
 	const [modalTable, setModalTable] = useState(null)
 
 	/**
@@ -53,16 +53,31 @@ function Dashboard({ date }) {
             }
         }
         loadTablesFromApi()
-    }, [trigger])
+    }, [])
 
 	async function unseatTable({ target }) {
 		const abortController = new AbortController()
-        const response = await seatTable(true, null, `${modalTable}`, abortController.signal)
-        if (response.message) {
-            setError(response)
-            return
-        }
-		setTrigger((prev) => !prev)
+        try {
+			const response = await seatTable(true, null, `${modalTable}`, abortController.signal)
+			if (response.message) {
+				setError(response)
+				return
+			}
+			//setTrigger((prev) => !prev)
+			
+
+		} catch (error) {
+			console.error(error)
+		}
+
+		try {
+			const fetchedTables = await listTables(abortController.signal)
+			const sortedTables = fetchedTables.sort((table) => table.table_name)
+			setTables(sortedTables)
+		} catch (error) {
+			console.error(error)
+		}
+
 	}
 	
 	const reservationsContent = reservations.map((reservation, index) => (		
@@ -92,7 +107,7 @@ function Dashboard({ date }) {
 		<tr key={index}>
 			<td>{table.table_name}</td>
 			<td>{table.capacity}</td>
-			{ table.reservation_id ? <td className="text-danger">occupied</td> : <td className="text-success">free</td> }
+			{ table.reservation_id ? <td data-table-id-status={table.table_id} className="text-danger">occupied</td> : <td data-table-id-status={table.table_id} className="text-success">free</td> }
 			<td>
 				<button 
 					data-table-id-finish={table.table_id}
@@ -140,8 +155,10 @@ function Dashboard({ date }) {
 								<th>Capacity</th>
 								<th>Status</th>
 								<th></th>					
-						</thead>						
-						{tablesContent}						
+						</thead>	
+						<tbody>
+							{tablesContent}						
+						</tbody>					
 					</table>
 				</div>
 			</div>

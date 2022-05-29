@@ -98,7 +98,7 @@ async function seatTable(req, res, next) {
         const data = await service.seatTable(updatedTable, updatedReservation)
         
         await res.json({ data })
-        console.log("data in controller", data)
+        
     } catch (error) {
         return next({ status: 400, message: `Error seating table` })
     }
