@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useHistory } from "react-router-dom"
-import { createTable, listTables } from "../utils/api"
+import { createTable } from "../utils/api"
 import ErrorAlert from "./ErrorAlert"
 
 export default function NewTable() {
-    // form with table name at least 2 characters and capacity 
-    // which must be at least 1
-
+   
     const history = useHistory()
 
     const initialFormData = {
@@ -14,7 +12,6 @@ export default function NewTable() {
         capacity: null,
     }
 
-    const [tables, setTables] = useState([])
     const [error, setError] = useState(null)
     const [formData, setFormData] = useState({ ...initialFormData })
 

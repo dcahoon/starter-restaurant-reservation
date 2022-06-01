@@ -1,29 +1,11 @@
 import React, { useState } from "react"
 import { useHistory } from "react-router-dom"
 import ErrorAlert from "./ErrorAlert"
-const moment = require("moment")
 const { createReservation } = require("../utils/api")
 
 export default function NewReservation() {
 
     const history = useHistory()
-
-    const [inputValid, setInputValid] = useState({
-        first_name: false,
-        last_name: false,
-        mobile_number: false,
-        reservation_date: false,
-        reservation_time: false,
-        people: false,
-    })
-
-   /*  await page.type("input[name=first_name]", "James");
-      await page.type("input[name=last_name]", lastName);
-      await page.type("input[name=mobile_number]", "800-555-1212");
-      await page.type("input[name=reservation_date]", "01012035");
-      await page.type("input[name=reservation_time]", "1330");
-      await page.type("input[name=people]", "2"); */
-    const lastName = Date.now().toString(10);
 
     const initialFormData = {
         first_name: "",
@@ -31,7 +13,7 @@ export default function NewReservation() {
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: null,
+        people: "",
         status: "Booked",
     }
 
@@ -39,47 +21,22 @@ export default function NewReservation() {
     const [error, setError] = useState(null)
 
     const handleChange = ({ target }) => {
-        
-        //setInputValid({ ...inputValid, [target.name]: !target.value })
-
-        //target.name === "people" ? Number(target.value) : target.value
 
         setFormData({
             ...formData,
             [target.name]: target.name === "people" ? Number(target.value) : target.value,
         })
-        /**
-         * add logic/switch to handle validation based on target
-         */
-        //console.log("target ID", target.id)
-        /* switch (target.id) {
-            case "first_name":
-                if (target.first_name === "") {
-                    setInputValid(() => inputValid.first_name = false)
-                }
-            case "last_name":
-                if (target.last_name === "") {
-                    setInputValid(inputValid.last_name = false)
-                }
-        } */
     }
 
     const handleReset = () => {
+
         setFormData({ ...initialFormData })
     }
 
     async function handleSubmit(event) {
+    
         event.preventDefault()
-        /* switch (event.target.id) {
-            case "first_name":
-                if (event.target.first_name === "") {
-                    setInputValid(inputValid.first_name = false)
-                }
-            case "last_name":
-                if (event.target.last_name === "") {
-                    setInputValid(inputValid.last_name = false)
-                }
-        } */
+        
         const abortController = new AbortController()
         const newReservation = { ...formData }
         try {
@@ -111,7 +68,6 @@ export default function NewReservation() {
                     onChange={handleChange}
                     value={formData.first_name}
                 />
-                { inputValid.first_name ? <div className="text-danger">First name is required.</div> : null }
             </div>
             <div className="form-group">
                 <label htmlFor="last_name" className="form-label">Last Name</label>
@@ -123,7 +79,6 @@ export default function NewReservation() {
                     onChange={handleChange}
                     value={formData.last_name}
                 />
-                { inputValid.last_name ? <div className="text-danger">Last name is required.</div> : null }
             </div>
             <div className="form-group">
                 <label htmlFor="mobile_number" className="form-label">Mobile Number</label>
@@ -206,11 +161,3 @@ export default function NewReservation() {
     )
 
 }
-
-/**
- * a way to keep track of sessions (manually or express.sessions) req.session property
- * (req.session.user)
- * 
- * bcrypt library (will encode passwords)
- * 
- */

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import ErrorAlert from "../layout/ErrorAlert"
-import { listTables, getReservation, seatTable } from "../utils/api"
+import { listTables, seatTable } from "../utils/api"
 
 export default function SeatReservation() {
 
@@ -16,8 +16,6 @@ export default function SeatReservation() {
 
         event.preventDefault()
         const abortController = new AbortController()
-
-        const reservation = await getReservation(abortController.signal, reservation_id)
         
         try {
             const response = await seatTable(false, reservation_id, tableBeingSeated, abortController.signal)
@@ -25,8 +23,7 @@ export default function SeatReservation() {
                 setError(response)
                 return
             }
-            history.push('/')
-            //history.push(`/dashboard/?date=${reservation.reservation_date}`)
+            history.go(-1)
         } catch (error) {
             setError(error.message)
         }

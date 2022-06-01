@@ -134,7 +134,8 @@ function Dashboard({ date }) {
 			<div className="row">
 				<div className="col-9 m-0">
 					<table className="table table-striped">
-						<thead className="thead-dark">
+						<thead>
+							<tr className="thead-dark">
 								<th>First Name</th>
 								<th>Last Name</th>
 								<th>People</th>
@@ -143,7 +144,8 @@ function Dashboard({ date }) {
 								<th>Reservation Time</th>
 								<th>Status</th>
 								<th>Seat</th>
-						</thead>	
+							</tr>	
+						</thead>
 						<tbody>
 							{reservationsContent}						
 						</tbody>					
@@ -151,12 +153,14 @@ function Dashboard({ date }) {
 				</div>
 				<div className="col-3 m-0">
 					<table className="table table-striped">
-						<thead className="thead-dark">
+						<thead>
+							<tr className="thead-dark">
 								<th>Table Name</th>
 								<th>Capacity</th>
 								<th>Status</th>
 								<th></th>					
-						</thead>	
+							</tr>	
+						</thead>
 						<tbody>
 							{tablesContent}						
 						</tbody>					
