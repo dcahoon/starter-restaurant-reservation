@@ -72,12 +72,12 @@ describe("US-05 - Finish an occupied table - E2E", () => {
 
       expect(containsOccupied).toBe(true);
 
-console.log("containsOccupied in test 5", containsOccupied)
+console.log("test5fe containsOccupied in test 5", containsOccupied)
 
       const finishButtonSelector = `[data-table-id-finish="${table.table_id}"]`;
       await page.waitForSelector(finishButtonSelector);
 
-console.log("finish button selector", finishButtonSelector)
+console.log("test5fe finish button selector", finishButtonSelector)
 
       page.on("dialog", async (dialog) => {
         expect(dialog.message()).toContain(
@@ -86,12 +86,17 @@ console.log("finish button selector", finishButtonSelector)
         await dialog.accept();
       });
 
-console.log("page.on passed")
+console.log("test5fe page.on passed...")
 
       await page.click(finishButtonSelector);
 
+console.log("test5fe page.click ln93 passed...")
+
+      const html = await page.$eval(`[data-table-id-status="${table.table_id}"]`, (e) => e.outerHTML);
+console.log("page html for finish button selector", html)
+
       await page.waitForResponse((response) => {
-console.log("response url", response.url)
+console.log("test5fe response url", response.url)
         return response.url().endsWith(`/tables`);
       });
 
@@ -100,13 +105,15 @@ console.log("response url", response.url)
         fullPage: true,
       });
 
+      console.log("page", page)
+
       const containsFree = await containsText(
         page,
         `[data-table-id-status="${table.table_id}"]`,
         "free"
       );
 
-console.log("contains free (should be true)", containsFree)
+console.log("test5fe contains free (should be true)", containsFree)
 
       expect(containsFree).toBe(true);
     });

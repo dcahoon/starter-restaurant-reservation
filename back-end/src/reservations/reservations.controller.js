@@ -3,10 +3,13 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 const moment = require("moment") // used to validate date input
 
 async function reservationExists(req, res, next) {
+console.log("reservations.controller.js reservationExists, checking for:", req.params.reservation_id)
   try {
     const reservation = await service.read(req.params.reservation_id)
+
     if (reservation) {
       res.locals.reservation = reservation
+console.log("reservations.controller.js reservationExists res.locals.reservation set to:", res.locals.reservation)
       next()
     } else {
       next({ status: 404, message: `Reservation ${req.params.reservation_id} not found` })
@@ -44,6 +47,16 @@ const hasReservationDate = dataHas("reservation_date")
 const hasReservationTime = dataHas("reservation_time")
 const hasPeople = dataHas("people")
 
+
+
+async function hasBookedStatus (req, res, next) {
+  const reservation = res.locals.reservation
+  if (reservation.status === "seated" || reservation.status === "finished") {
+    next({ status: 400, message: `Status cannot be seated or finished for a new reservation` })
+  }
+  return next()
+}
+
 async function hasValidDate (req, res, next) {
   const reservation = res.locals.reservation
   const result = moment(reservation.reservation_date, "YYYY-MM-DD", true).isValid()
@@ -53,7 +66,7 @@ async function hasValidDate (req, res, next) {
       const message = 'Date provided is a Tuesday, restaurant is closed.'
       next({ status: 400, message: message })
     }
-    //moment(reservation.reservation_date, "YYYY-MM-DD") < moment()
+    // Return error if reservation is made for a current or past date
     if (moment(reservation.reservation_date) < new Date()) {
       const message = 'Reservation must be for a future date.'
       next({ status: 400, message: message })
@@ -127,24 +140,53 @@ async function create(req, res, next) {
   })
 }
 
-async function changeStatusToBooked(req, res, next) {
+async function updateStatus(req, res, next) {
+  
+console.log("reservations.controller.js updateStatus res.locals.reservation:", res.locals.reservation)
+
   const reservation = res.locals.reservation
+
+console.log("reseravations.controller.js updateStatus res.locals.reservation:", reservation)
+  
+  const newStatus = req.body.data.status
+
+console.log("reservations.controller.js updateStatus new status from req.body.data:", newStatus)
+
+  // Check if status is valid
+
+  if (reservation.status === "finished") {
+console.log("reseravations.controller.js updateStatus status is finished, cannot update...")
+    next({ status: 400, message: `finished reservations cannot be updated` })
+  }
+  
+  const validStatusList = ["booked", "seated", "finished"]
+
+  if (!validStatusList.includes(newStatus)) {
+console.log("reseravations.controller.js updateStatus valid status list does not include the sent status...")
+    next({ status: 400, message: `unknown reservation status` })
+  }
+  
   const updatedReservation = {
     ...reservation,
-    status: "Booked",
+    status: newStatus,
   }
+
+console.log("reseravations.controller.js updateStatus updated reservation:", updatedReservation)
+
   const data = await service.update(updatedReservation)
-  res.json({ data })
+
+console.log("reseravations.controller.js updateStatus data returned from service:", data)
+
+  res.status(200).json( { data: { "status": newStatus } } )
+
 }
-
-
-
 
 
 module.exports = {
   list: [asyncErrorBoundary(list)],
   create: [
     asyncErrorBoundary(hasData), 
+    hasBookedStatus,
     hasFirstName,
     hasLastName,
     hasMobileNumber,
@@ -160,8 +202,22 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(read)
   ],
-  changeStatusToBooked: [
+  updateStatus: [
     asyncErrorBoundary(reservationExists),
-    asyncErrorBoundary(changeStatusToBooked),
+    asyncErrorBoundary(updateStatus),
   ],
 }
+
+/* PUT /reservations/:reservation_id/status
+      ✓ returns 404 for non-existent reservation_id (330 ms)
+      ✕ returns 400 for unknown status (304 ms)
+      ✕ returns 400 if status is currently finished (a finished reservation cannot be updated) (356 ms)
+      ✕ returns 200 for status 'booked' (301 ms)
+      ✕ returns 200 for status 'seated' (302 ms)
+      ✕ returns 200 for status 'finished' (321 ms) */
+
+
+/* POST /reservations
+      ✓ returns 201 if status is 'booked' (405 ms)
+      ✕ returns 400 if status is 'seated' (336 ms)
+      ✕ returns 400 if status is 'finished' (315 ms) */

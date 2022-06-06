@@ -27,7 +27,6 @@ function Dashboard({ date }) {
 	if (query) {
 		date = query
 	}
-
 	
 	useEffect(loadDashboard, [date, tables]);
 
@@ -66,7 +65,6 @@ function Dashboard({ date }) {
 			}
 			//setTrigger((prev) => !prev)
 			
-
 		} catch (error) {
 			console.error(error)
 		}

@@ -14,16 +14,31 @@ export default function SeatReservation() {
 
     async function handleSubmit(event) {
 
+console.log("seatreservation.js start of handleSubmit function...")
+
         event.preventDefault()
         const abortController = new AbortController()
         
         try {
             const response = await seatTable(false, reservation_id, tableBeingSeated, abortController.signal)
+
+console.log("seatreservation.js response in handleSubmit", response)
+
             if (response.message) {
                 setError(response)
+
+console.log("seatreservation.js message present in response, message:", response.message)
+
                 return
+
             }
-            history.go(-1)
+            
+            history.push("/dashboard")
+            
+
+console.log("seatreservation.js handleSubmit successful, going back to dashboard...")
+
+
         } catch (error) {
             setError(error.message)
         }
@@ -31,30 +46,38 @@ export default function SeatReservation() {
     }
 
     const handleChange = (event) => {
+console.log("seatreservation.js handleChange called...")
         setTableBeingSeated(event.target.value)
-        // setError(null)
     }
 
     async function handleCancel(event) {
+console.log("seatreservation.js handleCancel called...")
         event.preventDefault()
-        history.goBack();
+        history.go(-1);
     }
 
     /** Loads tables from API */
     useEffect(() => {
+console.log("seatreservation.js entering useEffect to load tables...")
         const abortController = new AbortController()
         setError(null)
         async function loadTablesFromApi() {
+console.log("seatreservation.js entering loadTablesFromApi function...")
             try {
+console.log("seatreservation.js attempting to list tables...")
                 const response = await listTables(abortController.signal)
                 const tables = response.map((table) => (
                     { ...table }
                 ))
+console.log("seatreservation.js response from listTables:", response)
                 setTables(tables)
-                } catch(error) {
-                    setError(error)
-                }
+console.log("seatreservation.js tables have been loaded...")
+            } catch(error) {
+console.log("seatreservation.js error loading tables...")
+                setError(error)
             }
+        }
+console.log("seatreservation.js calling loadTablesFromApi funtion within useEffect...")
             loadTablesFromApi()
    
     }, [])

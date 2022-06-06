@@ -28,9 +28,14 @@ function update(updatedTable) {
 
 async function seatTable(updatedTable, updatedReservation) {
 
+console.log("tables.service.js seatTable updatedTable passed into seatTable method:", updatedTable)
+console.log("tables.service.js seatTable updatedReservation passed into seatTable method:", updatedReservation)
+
     let responseTable = {}
 
     try {
+
+console.log("tables.service.js attempting transaction in seatTable...")
 
         await knex.transaction(async trx => {
 
@@ -40,18 +45,24 @@ async function seatTable(updatedTable, updatedReservation) {
                 .returning("*")
                 .transacting(trx)
 
-            const reservation = await knex('reservations')
+console.log("tables.service.js responseTable from tables table:", responseTable)
+
+            await knex('reservations')
                 .where({ reservation_id: updatedReservation.reservation_id })
                 .update(updatedReservation, "*")
                 .transacting(trx)
 
         })
 
+console.log("tables.service.js end of try/catch for seatTable transaction...")
+
     } catch (error) {
+console.log("tables.service.js caught error in transaction...")
         console.error(error)
     }
 
-    return responseTable
+console.log("tables.service.js returning response table:", responseTable)
+    return responseTable[0]
 
 }
 

@@ -9,7 +9,7 @@ export default function NewTable() {
 
     const initialFormData = {
         table_name: "",
-        capacity: null,
+        capacity: 0,
     }
 
     const [error, setError] = useState(null)
@@ -48,7 +48,7 @@ export default function NewTable() {
                 setError(response)
                 return
             }
-            history.push(`/dashboard/?date=${formData.reservation_date}`)
+            history.go(-1)
         } catch (error) {
             setError(error.message)
         }
