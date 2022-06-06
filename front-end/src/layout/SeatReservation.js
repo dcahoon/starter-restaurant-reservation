@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import ErrorAlert from "../layout/ErrorAlert"
-import { listTables, seatTable } from "../utils/api"
+import { listTables, seatTable, getReservation } from "../utils/api"
 
 export default function SeatReservation() {
 
@@ -31,8 +31,11 @@ console.log("seatreservation.js message present in response, message:", response
 
                 return
             }
+
+            // getReservation(signal, reservation_id)
+            const reservationFromApi = await getReservation(abortController.signal, reservation_id)
             
-            history.push("/dashboard")
+            history.push(`/dashboard?date=${reservationFromApi.reservation_date}`)
 
 console.log("seatreservation.js handleSubmit successful, going back to dashboard...")
 
