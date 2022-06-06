@@ -62,7 +62,7 @@ describe("US-05 - Finish an occupied table - E2E", () => {
         fullPage: true,
       });
 
-      /** ERROR IN THIS CODE CHUNK */
+      
 
       const containsOccupied = await containsText(
         page,

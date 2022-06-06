@@ -30,14 +30,11 @@ console.log("seatreservation.js response in handleSubmit", response)
 console.log("seatreservation.js message present in response, message:", response.message)
 
                 return
-
             }
             
             history.push("/dashboard")
-            
 
 console.log("seatreservation.js handleSubmit successful, going back to dashboard...")
-
 
         } catch (error) {
             setError(error.message)
@@ -107,4 +104,5 @@ console.log("seatreservation.js calling loadTablesFromApi funtion within useEffe
             <ErrorAlert error={error} />
         </div>
     )
+
 }
