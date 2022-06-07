@@ -112,7 +112,7 @@ console.log("tables.controller.js seatTable error caught when trying to fetch re
 console.log("tables.controller.js seatTable reservation loaded successfully, checking if already seated...")
 
     // if reservation is already seated, return error
-    if (reservation.status === "Seated") {
+    if (reservation.status === "seated") {
         return next({ status: 400, message: `Reservation is already seated` })
     }
 

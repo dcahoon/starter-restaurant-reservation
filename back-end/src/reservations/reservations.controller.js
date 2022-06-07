@@ -123,6 +123,14 @@ async function read(req, res, next) {
 }
 
 async function list(req, res, next) {
+
+  const mobileNumber = req.query.mobile_number
+
+  if (mobileNumber) {
+    const data = await service.search(mobileNumber)
+    res.json({ data })
+  }
+
   const date = req.query.date
   if (date) {
     const data = await service.listReservationsByDate(date)
@@ -138,6 +146,24 @@ async function create(req, res, next) {
   res.status(201).json({
     data: newReservation,
   })
+}
+
+async function updateReservation(req, res, next) {
+
+  // Only "booked" reservations can be updated
+  const updatedReservation = req.body.data
+  if (updatedReservation.status !== "booked") {
+    next({ status: 400, message: `Status must be "booked" to update reservation` })
+  }
+
+  try {
+    const data = await service.update(updatedReservation)
+    const extractedFromArray = data[0]
+    res.status(200).json({ data: extractedFromArray })
+  } catch (error) {
+    next({ status: 400, message: error.message })
+  }
+
 }
 
 async function updateStatus(req, res, next) {
@@ -159,7 +185,7 @@ console.log("reseravations.controller.js updateStatus status is finished, cannot
     next({ status: 400, message: `finished reservations cannot be updated` })
   }
   
-  const validStatusList = ["booked", "seated", "finished"]
+  const validStatusList = ["booked", "seated", "finished", "cancelled"]
 
   if (!validStatusList.includes(newStatus)) {
 console.log("reseravations.controller.js updateStatus valid status list does not include the sent status...")
@@ -202,11 +228,28 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(read)
   ],
+  updateReservation: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(hasData),
+    hasFirstName,
+    hasLastName,
+    hasMobileNumber,
+    hasReservationDate,
+    asyncErrorBoundary(hasValidDate),
+    hasReservationTime,
+    hasValidTime,
+    hasPeople,
+    hasValidPeople,
+    asyncErrorBoundary(updateReservation)
+  ],
   updateStatus: [
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(updateStatus),
   ],
 }
+
+// set the status of the reservation to cancelled using a PUT to /reservations/:reservation_id/status 
+// with a body of {data: { status: "cancelled" } }
 
 /* PUT /reservations/:reservation_id/status
       ✓ returns 404 for non-existent reservation_id (330 ms)
