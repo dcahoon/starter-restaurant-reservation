@@ -14,7 +14,7 @@ export default function NewReservation() {
         reservation_date: "",
         reservation_time: "",
         people: "",
-        status: "Booked",
+        status: "booked",
     }
 
     const [formData, setFormData] = useState({ ...initialFormData })

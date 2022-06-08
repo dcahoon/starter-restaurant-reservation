@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, seatTable } from "../utils/api";
+import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useLocation, Link } from "react-router-dom"
 
@@ -27,44 +27,46 @@ function Dashboard({ date }) {
 	if (query) {
 		date = query
 	}
-	
-	useEffect(loadDashboard, [date, tables]);
 
+	
 	function loadDashboard() {
+		console.log("Dashboard.js loadDashboard useEffect to load reservations...")
 		const abortController = new AbortController();
 		setError(null);
 		listReservations({ date }, abortController.signal)
-			.then(setReservations)
-			.catch(setError);
+		.then(setReservations)
+		.catch(setError);
 		return () => abortController.abort();
 	}
-
-    useEffect(() => {
-        const abortController = new AbortController()
-        setError(null)
-        async function loadTablesFromApi() {
-            try {
-                const response = await listTables(abortController.signal)
+	
+	useEffect(() => {
+		console.log("Dashboard.js useEffect loading tables from api...")
+		const abortController = new AbortController()
+		setError(null)
+		async function loadTablesFromApi() {
+			try {
+				const response = await listTables(abortController.signal)
 				const sortedTables = response.sort((table) => table.table_name)
 				setTables(sortedTables)
-            } catch(error) {
-                setError(error)
-            }
-        }
-        loadTablesFromApi()
-    }, [])
+			} catch(error) {
+				setError(error)
+			}
+		}
+		loadTablesFromApi()
+	}, [])
+	
+	useEffect(loadDashboard, [date, tables])
 
 	async function unseatTable({ target }) {
 		
 		const abortController = new AbortController()
+
         try {
-			const response = await seatTable(true, null, `${modalTable}`, abortController.signal)
+			const response = await finishTable(null, `${modalTable}`, abortController.signal)
 			if (response.message) {
 				setError(response)
 				return
 			}
-			//setTrigger((prev) => !prev)
-			
 		} catch (error) {
 			console.error(error)
 		}
@@ -87,26 +89,38 @@ function Dashboard({ date }) {
 			<td>{reservation.mobile_number}</td>
 			<td>{reservation.reservation_date}</td>
 			<td>{reservation.reservation_time}</td>
-			<td>{reservation.status}</td>
+			<td><span data-reservation-id-status={reservation.reservation_id}>{reservation.status}</span></td>
 			<td>
-				<Link 
-					className="btn btn-dark"
-					disabled={!reservation.status==="Booked"?false:true}
-					data-reservation-id-status={reservation.reservation_id} 
+				<Link
 					to={`/reservations/${reservation.reservation_id}/seat`}
 					reservation={reservation}
 				>
-					Seat
+					<button hidden={reservation.status === "seated"}>
+						Seat
+					</button>
 				</Link>
 			</td>
       	</tr>
   	))
+
+// console.log("dashboard.js reservationsContent:", reservationsContent)
   
   	const tablesContent = tables.map((table, index) => (  
 		<tr key={index}>
 			<td>{table.table_name}</td>
 			<td>{table.capacity}</td>
-			{ table.reservation_id ? <td data-table-id-status={table.table_id} className="text-danger">occupied</td> : <td data-table-id-status={table.table_id} className="text-success">free</td> }
+			{ table.reservation_id ? 
+				<td className="text-danger">
+					<span data-table-id-status={table.table_id}>
+						occupied
+					</span>
+				</td> : 
+				<td className="text-success">
+					<span data-table-id-status={table.table_id}>
+						free
+					</span>
+				</td> 
+			}
 			<td>
 				<button 
 					data-table-id-finish={table.table_id}

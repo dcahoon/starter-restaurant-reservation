@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import ErrorAlert from "../layout/ErrorAlert"
 import { listTables, seatTable, getReservation } from "../utils/api"
+import moment from "moment"
 
 export default function SeatReservation() {
 
@@ -20,7 +21,7 @@ console.log("seatreservation.js start of handleSubmit function...")
         const abortController = new AbortController()
         
         try {
-            const response = await seatTable(false, reservation_id, tableBeingSeated, abortController.signal)
+            const response = await seatTable(reservation_id, tableBeingSeated, abortController.signal)
 
 console.log("seatreservation.js response in handleSubmit", response)
 
@@ -34,6 +35,8 @@ console.log("seatreservation.js message present in response, message:", response
 
             // getReservation(signal, reservation_id)
             const reservationFromApi = await getReservation(abortController.signal, reservation_id)
+    
+console.log("SeatReservation.js handleSubmit formatted date:", reservationFromApi.reservation_date)
             
             history.push(`/dashboard?date=${reservationFromApi.reservation_date}`)
 
