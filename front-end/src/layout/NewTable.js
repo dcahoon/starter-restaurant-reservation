@@ -26,18 +26,18 @@ export default function NewTable() {
 
     async function handleSubmit(event) {
         event.preventDefault()
-console.log("NewTable.js handleSubmit beginning handleSubmit function...")
+//console.log("NewTable.js handleSubmit beginning handleSubmit function...")
         
-console.log("NewTable.js handleSubmit checking for table name length...")
+//console.log("NewTable.js handleSubmit checking for table name length...")
         if (formData.table_name.length < 2) {
-console.log("NewTable.js handleSubmit table name is not long enough, returning error...")
+//console.log("NewTable.js handleSubmit table name is not long enough, returning error...")
             setError({ message: `Table name must be at least 2 characters` })
             return
         }
-console.log("NewTable.js handleSubmit table name is long enough, checking that capacity is a number...")
+//console.log("NewTable.js handleSubmit table name is long enough, checking that capacity is a number...")
 
         if (typeof parseInt(formData.capacity) !== "number") {
-console.log("NewTable.js handleSubmit capacity is not a number, returning error...")
+//console.log("NewTable.js handleSubmit capacity is not a number, returning error...")
             setError({ message: `Table capacity must be a number` })
             return
         }
@@ -45,22 +45,23 @@ console.log("NewTable.js handleSubmit capacity is not a number, returning error.
         const abortController = new AbortController()
         const newTable = { ...formData, capacity: parseInt(formData.capacity) }
 
-console.log("NewTable.js handleSubmit new table to submit to api:", newTable)
+//console.log("NewTable.js handleSubmit new table to submit to api:", newTable)
         
         try {
             const response = await createTable(newTable, abortController.signal)
-console.log("newTable.js handleSubmit response in try/catch:", response)
+//console.log("newTable.js handleSubmit response in try/catch:", response)
             if (response.message) {
-console.log("NewTable.js handleSubmit inside try checking for response message:", response.message)
+//console.log("NewTable.js handleSubmit inside try checking for response message:", response.message)
                 setError(response)
                 return
             }
-console.log("NewTable.js handleSubmit no message in response...")
-            history.go(-1)
+//console.log("NewTable.js handleSubmit no message in response...")
         } catch (error) {
-console.log("NewTable.js handleSubmit inside catch:", error)
+//console.log("NewTable.js handleSubmit inside catch:", error)
             setError(error.message)
+            return
         }
+        history.go(-1)
     }
 
     function handleCancel(event) {
@@ -106,7 +107,6 @@ console.log("NewTable.js handleSubmit inside catch:", error)
                         id="submit"
                         name="submit"
                         className="btn btn-primary"
-                        onClick={handleSubmit}
                     >
                         Submit
                     </button>

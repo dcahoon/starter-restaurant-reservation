@@ -35,10 +35,12 @@ describe("US-04 - Seat reservation - E2E", () => {
       await page.goto(`${baseURL}/tables/new`, { waitUntil: "networkidle0" });
     });
 
-    test("filling and submitting form creates a new table", async () => {
-console.log("*** TEST-04-SUBMIT SUBMITTING FORM CREATES A NEW TABLE...")
-      const tableName = `#${Date.now().toString(10)}`;
 
+
+    test("filling and submitting form creates a new table", async () => {
+//console.log("*** TEST-04-SUBMIT SUBMITTING FORM CREATES A NEW TABLE...")
+      
+      const tableName = `#${Date.now().toString(10)}`;
       await page.type("input[name=table_name]", tableName);
       await page.type("input[name=capacity]", "6");
 
@@ -52,18 +54,21 @@ console.log("*** TEST-04-SUBMIT SUBMITTING FORM CREATES A NEW TABLE...")
         page.waitForNavigation({ waitUntil: "networkidle0" }),
       ]);
 
-console.log("*** TEST-04-SUBMIT promises returned, taking screenshot...")
+//console.log("*** TEST-04-SUBMIT promises returned, taking screenshot...")
 
       await page.screenshot({
         path: ".screenshots/us-04-create-table-submit-after.png",
         fullPage: true,
       });
 
-console.log("*** TEST-04-SUBMIT screenshot taken, checking expected result...")
-console.log("*** TEST-04-SUBMIT expecting page to equal tableName, tableName:", tableName)
+//console.log("*** TEST-04-SUBMIT expecting page to equal tableName, tableName:", tableName)
 
       await expect(page).toMatch(tableName);
+      
     });
+
+
+
     test("omitting table_name and submitting does not create a new table", async () => {
   
 console.log("*** TEST-04-OMIT-NAME omitting table_name and submitting does not create a new table...")

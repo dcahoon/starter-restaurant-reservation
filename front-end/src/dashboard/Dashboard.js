@@ -27,10 +27,9 @@ function Dashboard({ date }) {
 	if (query) {
 		date = query
 	}
-
 	
 	function loadDashboard() {
-		console.log("Dashboard.js loadDashboard useEffect to load reservations...")
+		//console.log("Dashboard.js loadDashboard useEffect to load reservations...")
 		const abortController = new AbortController();
 		setError(null);
 		listReservations({ date }, abortController.signal)
@@ -38,6 +37,9 @@ function Dashboard({ date }) {
 		.catch(setError);
 		return () => abortController.abort();
 	}
+	
+	
+	useEffect(loadDashboard, [date, tables])
 	
 	useEffect(() => {
 		console.log("Dashboard.js useEffect loading tables from api...")
@@ -54,8 +56,6 @@ function Dashboard({ date }) {
 		}
 		loadTablesFromApi()
 	}, [])
-	
-	useEffect(loadDashboard, [date, tables])
 
 	async function unseatTable({ target }) {
 		
@@ -91,12 +91,14 @@ function Dashboard({ date }) {
 			<td>{reservation.reservation_time}</td>
 			<td><span data-reservation-id-status={reservation.reservation_id}>{reservation.status}</span></td>
 			<td>
-				<Link
-					to={`/reservations/${reservation.reservation_id}/seat`}
-					reservation={reservation}
-				>
+				<Link to={`/reservations/${reservation.reservation_id}/seat`}>
 					<button hidden={reservation.status === "seated"}>
 						Seat
+					</button>
+				</Link>
+				<Link to={`/reservations/${reservation.reservation_id}/edit`}>
+					<button hidden={reservation.status === "seated"}>
+						Edit
 					</button>
 				</Link>
 			</td>
@@ -155,7 +157,7 @@ function Dashboard({ date }) {
 								<th>Reservation Date</th>
 								<th>Reservation Time</th>
 								<th>Status</th>
-								<th>Seat</th>
+								<th></th>
 							</tr>	
 						</thead>
 						<tbody>

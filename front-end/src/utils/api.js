@@ -68,7 +68,7 @@ export async function listReservations(params, signal) {
     .then(formatReservationTime);
 }
 
-export async function getReservation(signal, reservation_id) {
+export async function getReservation(reservation_id, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`)
   try {
     return await fetchJson(url, 
@@ -175,29 +175,38 @@ export async function finishTable(reservationId, tableId, signal) {
   }
 }
 
+export async function searchByNumber(mobileNumber, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations?mobile_number=${mobileNumber}`)
+  try {
+    const response = await fetchJson(url, {
+      method: 'GET',
+      headers,
+      signal
+    }, [])
+    return response
+  } catch (error) {
+    console.error(error)
+    return error
+  }
+}
+
+export async function updateReservation(updatedReservation, signal) {
+  const url = new URL(`${API_BASE_URL}/reservations/${updatedReservation.reservation_id}`)
+  console.log("api.js updateReservation url:", url)
+  try {
+    const response = await fetchJson(url, {
+      method: 'PUT',
+      headers,
+      signal,
+      body: JSON.stringify({ data: { ...updatedReservation } })
+    }, [])
+    return response
+  } catch (error) {
+    console.error(error)
+    return error
+  }
+}
 
 
 
-/* try {
-  const url = new URL(`${API_BASE_URL}/reservations/new`)
-  const response = await fetch(url, {
-    method: 'POST',
-    headers,
-    signal,
-    body: newReservation,
-  })
-  if (response.status === 204) {
-    return null;
-  }
-  const payload = await response.json();
-  if (payload.error) {
-    return Promise.reject({ message: payload.error });
-  }
-  return payload.data;
-} catch (error) {
-  if (error.name !== "AbortError") {
-    console.error(error.stack);
-    throw error;
-  }
-  return Promise.resolve(signal);
-} */
+
