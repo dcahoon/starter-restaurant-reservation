@@ -1,4 +1,4 @@
-import { searchByNumber } from "../utils/api"
+import { searchByNumber, updateStatus } from "../utils/api"
 import ErrorAlert from "./ErrorAlert"
 import { useState } from "react"
 import { Link } from "react-router-dom"
@@ -32,6 +32,30 @@ export default function Search() {
         }
     }
 
+    async function cancelReservation(reservationId) {
+        const { signal } = new AbortController()
+        if (window.confirm('Do you want to cancel this reservation? This cannot be undone.')) {
+            try {
+                const response = await updateStatus(reservationId, "cancelled", signal)
+                if (response.message) {
+                    setError()
+                    return
+                }
+                if (response.length === 0) {
+                    setSearchResults([])
+                    setError({ message: "No reservations found" })
+                    return
+                } else {
+                    setSearchResults(response)
+                    return
+                }
+            } catch (error) {
+                setError(error)
+            }
+        }
+        return
+    }
+
     const searchResultsContent = searchResults.map((reservation, index) => (
         <tr key={index}>
 			<td>{reservation.first_name}</td>
@@ -47,7 +71,7 @@ export default function Search() {
 						Edit
 					</button>
 				</Link>
-                <button>
+                <button data-reservation-id-cancel={reservation.reservation_id} onClick={() => cancelReservation(reservation.reservation_id)}>
                     Cancel
                 </button>
 			</td>

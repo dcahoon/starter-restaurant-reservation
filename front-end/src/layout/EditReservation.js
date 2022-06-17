@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import ErrorAlert from "./ErrorAlert"
+import moment from "moment"
 const { updateReservation, getReservation } = require("../utils/api")
 
 export default function EditReservation() {
@@ -15,6 +16,7 @@ export default function EditReservation() {
         reservation_time: "",
         people: "",
         status: "",
+        reservation_id: "",
     }
 
     const [formData, setFormData] = useState({ ...initialFormData })
@@ -33,9 +35,11 @@ console.log("EditReservation.js useEffect load reservation from api:", reservati
                     first_name: res.first_name,
                     last_name: res.last_name,
                     mobile_number: res.mobile_number,
-                    reservation_date: res.reservation_date,
+                    reservation_date: moment(res.reservation_date).format('YYYY-MM-DD'),
                     reservation_time: res.reservation_time,
-                    people: res.people
+                    people: res.people,
+                    status: res.status,
+                    reservation_id: res.reservation_id
                 })
             } catch (error) {
                 setError(error)
@@ -51,6 +55,7 @@ console.log("EditReservation.js useEffect load reservation from api:", reservati
             ...formData,
             [target.name]: target.name === "people" ? Number(target.value) : target.value,
         })
+console.log("EditReservation.js handleChange reservation time:", formData.reservation_time)
     }
 
     const handleReset = () => {
@@ -58,7 +63,7 @@ console.log("EditReservation.js useEffect load reservation from api:", reservati
     }
 
     async function handleSubmit(event) {
-    
+console.log("EditReservation.js handleSubmit reservation time:", formData.reservation_time)
         event.preventDefault()
         
         const abortController = new AbortController()

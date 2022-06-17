@@ -1,8 +1,9 @@
 
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, finishTable } from "../utils/api";
+import { listReservations, listTables, finishTable, updateStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useLocation, Link } from "react-router-dom"
+import ReservationsList from "../layout/ReservationsList"
 
 /**
  * Defines the dashboard page.
@@ -15,9 +16,7 @@ function Dashboard({ date }) {
 	const [reservations, setReservations] = useState([]);
 	const [tables, setTables] = useState([])
 	const [error, setError] = useState(null)
-	//const [trigger, setTrigger] = useState(true)
-	const [modalTable, setModalTable] = useState(null)
-
+	
 	/**
 	 * The following code gets the query from the URL and if a date is provided,
 	 * sets the date fetched from the API.
@@ -27,86 +26,67 @@ function Dashboard({ date }) {
 	if (query) {
 		date = query
 	}
-	
-	function loadDashboard() {
-		//console.log("Dashboard.js loadDashboard useEffect to load reservations...")
-		const abortController = new AbortController();
-		setError(null);
-		listReservations({ date }, abortController.signal)
-		.then(setReservations)
-		.catch(setError);
-		return () => abortController.abort();
-	}
-	
-	
-	useEffect(loadDashboard, [date, tables])
-	
+
 	useEffect(() => {
-		console.log("Dashboard.js useEffect loading tables from api...")
 		const abortController = new AbortController()
-		setError(null)
-		async function loadTablesFromApi() {
-			try {
-				const response = await listTables(abortController.signal)
-				const sortedTables = response.sort((table) => table.table_name)
-				setTables(sortedTables)
-			} catch(error) {
+		loadReservationsAndTables(abortController.signal)
+		return () => abortController.abort()
+	}, [date])
+
+	async function loadReservationsAndTables(signal) {
+		try {
+			const reservationsFromApi = await listReservations({date}, signal)
+			setReservations(reservationsFromApi)
+			const tablesFromApi = await listTables(signal)
+			const sortedTables = tablesFromApi.sort((table) => table.table_name)
+			setTables(sortedTables)
+		} catch (error) {
+			if (error.name === "AbortError") {
+				console.log("Aborted")
+			} else {
 				setError(error)
 			}
 		}
-		loadTablesFromApi()
-	}, [])
-
-	async function unseatTable({ target }) {
-		
-		const abortController = new AbortController()
-
-        try {
-			const response = await finishTable(null, `${modalTable}`, abortController.signal)
-			if (response.message) {
-				setError(response)
-				return
-			}
-		} catch (error) {
-			console.error(error)
-		}
-
-		try {
-			const fetchedTables = await listTables(abortController.signal)
-			const sortedTables = fetchedTables.sort((table) => table.table_name)
-			setTables(sortedTables)
-		} catch (error) {
-			console.error(error)
-		}
-
 	}
-	
-	const reservationsContent = reservations.map((reservation, index) => (		
-		<tr key={index}>
-			<td>{reservation.first_name}</td>
-			<td>{reservation.last_name}</td>
-			<td>{reservation.people}</td>
-			<td>{reservation.mobile_number}</td>
-			<td>{reservation.reservation_date}</td>
-			<td>{reservation.reservation_time}</td>
-			<td><span data-reservation-id-status={reservation.reservation_id}>{reservation.status}</span></td>
-			<td>
-				<Link to={`/reservations/${reservation.reservation_id}/seat`}>
-					<button hidden={reservation.status === "seated"}>
-						Seat
-					</button>
-				</Link>
-				<Link to={`/reservations/${reservation.reservation_id}/edit`}>
-					<button hidden={reservation.status === "seated"}>
-						Edit
-					</button>
-				</Link>
-			</td>
-      	</tr>
-  	))
 
-// console.log("dashboard.js reservationsContent:", reservationsContent)
-  
+	async function unseatTable(tableId) {
+		
+		if(window.confirm('Is this table ready to seat new guests? This cannot be undone.')) {
+			try {	
+				const response = await finishTable(tableId)
+			} catch (error) {
+				setError(error)
+			}
+			const abortController = new AbortController()
+	
+			try {
+				const fetchedTables = await listTables(abortController.signal)
+				const sortedTables = fetchedTables.sort((table) => table.table_name)
+				setTables(sortedTables)
+			} catch (error) {
+				console.error(error)
+			}
+			loadReservationsAndTables()
+		}
+	}
+
+	async function cancelReservation(reservationId) {
+        const { signal } = new AbortController()
+        if (window.confirm('Do you want to cancel this reservation? This cannot be undone.')) {
+            try {
+                const response = await updateStatus(reservationId, "cancelled", signal)
+                if (response.message) {
+                    setError(response)
+                    return
+                }
+				loadReservationsAndTables()
+            } catch (error) {
+                setError(error)
+            }
+        }
+        return
+    }
+
   	const tablesContent = tables.map((table, index) => (  
 		<tr key={index}>
 			<td>{table.table_name}</td>
@@ -130,7 +110,7 @@ function Dashboard({ date }) {
 					className="btn btn-primary" 
 					data-toggle="modal" 
 					data-target="#confirmationModal"
-					onClick={() => setModalTable(table.table_id)}
+					onClick={() => unseatTable(table.table_id)}
 				>
 					Finish
 				</button>
@@ -147,23 +127,7 @@ function Dashboard({ date }) {
 			<ErrorAlert error={error} />
 			<div className="row">
 				<div className="col-9 m-0">
-					<table className="table table-striped">
-						<thead>
-							<tr className="thead-dark">
-								<th>First Name</th>
-								<th>Last Name</th>
-								<th>People</th>
-								<th>Mobile Number</th>
-								<th>Reservation Date</th>
-								<th>Reservation Time</th>
-								<th>Status</th>
-								<th></th>
-							</tr>	
-						</thead>
-						<tbody>
-							{reservationsContent}						
-						</tbody>					
-					</table>
+					<ReservationsList reservations={reservations} cancelReservation={cancelReservation} />
 				</div>
 				<div className="col-3 m-0">
 					<table className="table table-striped">
@@ -179,26 +143,6 @@ function Dashboard({ date }) {
 							{tablesContent}						
 						</tbody>					
 					</table>
-				</div>
-			</div>
-			{/** Modal Window */ }
-			<div className="modal fade" id="confirmationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-				<div className="modal-dialog" role="document">
-					<div className="modal-content">
-						<div className="modal-header">
-							<h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
-							<button type="button" className="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-						<div className="modal-body">
-							Is this table ready to seat new guests? This cannot be undone.
-						</div>
-					<div className="modal-footer">
-						<button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
-						<button type="button" className="btn btn-primary" onClick={unseatTable} data-dismiss="modal">OK</button>
-					</div>
-					</div>
 				</div>
 			</div>
 

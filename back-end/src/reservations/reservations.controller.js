@@ -3,13 +3,13 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 const moment = require("moment") // used to validate date input
 
 async function reservationExists(req, res, next) {
-console.log("reservations.controller.js reservationExists, checking for:", req.params.reservation_id)
+
   try {
     const reservation = await service.read(req.params.reservation_id)
 
     if (reservation) {
       res.locals.reservation = reservation
-console.log("reservations.controller.js reservationExists res.locals.reservation set to:", res.locals.reservation)
+
       next()
     } else {
       next({ status: 404, message: `Reservation ${req.params.reservation_id} not found` })
@@ -90,7 +90,6 @@ function hasValidTime(req, res, next) {
     if (latestResTime.isBefore(resTime)) {
       next({ status: 400, message: "Latest reservation time is 9:30 PM."})
     }
-
     return next()
   }
   const message = `reservation_time is invalid.`
@@ -153,7 +152,7 @@ async function updateReservation(req, res, next) {
   // Only "booked" reservations can be updated
   const updatedReservation = req.body.data
   if (updatedReservation.status !== "booked") {
-    next({ status: 400, message: `Status must be "booked" to update reservation` })
+    return next({ status: 400, message: `Status must be "booked" to update reservation` })
   }
 
   try {
@@ -161,35 +160,25 @@ async function updateReservation(req, res, next) {
     const extractedFromArray = data[0]
     res.status(200).json({ data: extractedFromArray })
   } catch (error) {
-    next({ status: 400, message: error.message })
+    return next({ status: 400, message: error.message })
   }
 
 }
 
 async function updateStatus(req, res, next) {
-  
-console.log("reservations.controller.js updateStatus res.locals.reservation:", res.locals.reservation)
 
   const reservation = res.locals.reservation
 
-console.log("reseravations.controller.js updateStatus res.locals.reservation:", reservation)
-  
   const newStatus = req.body.data.status
 
-console.log("reservations.controller.js updateStatus new status from req.body.data:", newStatus)
-
-  // Check if status is valid
-
   if (reservation.status === "finished") {
-console.log("reseravations.controller.js updateStatus status is finished, cannot update...")
-    next({ status: 400, message: `finished reservations cannot be updated` })
+    return next({ status: 400, message: `finished reservations cannot be updated` })
   }
   
   const validStatusList = ["booked", "seated", "finished", "cancelled"]
 
   if (!validStatusList.includes(newStatus)) {
-console.log("reseravations.controller.js updateStatus valid status list does not include the sent status...")
-    next({ status: 400, message: `unknown reservation status` })
+    return next({ status: 400, message: `unknown reservation status` })
   }
   
   const updatedReservation = {
@@ -197,13 +186,9 @@ console.log("reseravations.controller.js updateStatus valid status list does not
     status: newStatus,
   }
 
-console.log("reseravations.controller.js updateStatus updated reservation:", updatedReservation)
-
   const data = await service.update(updatedReservation)
 
-console.log("reseravations.controller.js updateStatus data returned from service:", data)
-
-  res.status(200).json( { data: { "status": newStatus } } )
+  res.status(200).json( { data: { status: newStatus } } )
 
 }
 
@@ -247,20 +232,3 @@ module.exports = {
     asyncErrorBoundary(updateStatus),
   ],
 }
-
-// set the status of the reservation to cancelled using a PUT to /reservations/:reservation_id/status 
-// with a body of {data: { status: "cancelled" } }
-
-/* PUT /reservations/:reservation_id/status
-      ✓ returns 404 for non-existent reservation_id (330 ms)
-      ✕ returns 400 for unknown status (304 ms)
-      ✕ returns 400 if status is currently finished (a finished reservation cannot be updated) (356 ms)
-      ✕ returns 200 for status 'booked' (301 ms)
-      ✕ returns 200 for status 'seated' (302 ms)
-      ✕ returns 200 for status 'finished' (321 ms) */
-
-
-/* POST /reservations
-      ✓ returns 201 if status is 'booked' (405 ms)
-      ✕ returns 400 if status is 'seated' (336 ms)
-      ✕ returns 400 if status is 'finished' (315 ms) */
