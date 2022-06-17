@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { listReservations, listTables, finishTable, updateStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { useLocation, Link } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import ReservationsList from "../layout/ReservationsList"
 
 /**
@@ -53,7 +53,7 @@ function Dashboard({ date }) {
 		
 		if(window.confirm('Is this table ready to seat new guests? This cannot be undone.')) {
 			try {	
-				const response = await finishTable(tableId)
+				await finishTable(tableId)
 			} catch (error) {
 				setError(error)
 			}
