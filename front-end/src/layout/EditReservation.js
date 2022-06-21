@@ -29,7 +29,6 @@ export default function EditReservation() {
         async function loadReservationFromApi() {
             try {
                 const reservationFromApi = await getReservation(reservation_id, abortController.signal)
-console.log("EditReservation.js useEffect load reservation from api:", reservationFromApi)
                 const res = reservationFromApi
                 setFormData({
                     first_name: res.first_name,
@@ -55,7 +54,6 @@ console.log("EditReservation.js useEffect load reservation from api:", reservati
             ...formData,
             [target.name]: target.name === "people" ? Number(target.value) : target.value,
         })
-console.log("EditReservation.js handleChange reservation time:", formData.reservation_time)
     }
 
     const handleReset = () => {
@@ -63,11 +61,10 @@ console.log("EditReservation.js handleChange reservation time:", formData.reserv
     }
 
     async function handleSubmit(event) {
-console.log("EditReservation.js handleSubmit reservation time:", formData.reservation_time)
         event.preventDefault()
         
         const abortController = new AbortController()
-        const updatedReservation = { ...formData }
+        const updatedReservation = { ...formData, reservation_time: formData.reservation_time.slice(0, 5) }
         try {
             const response = await updateReservation(updatedReservation, abortController.signal)
             if (response.message) {

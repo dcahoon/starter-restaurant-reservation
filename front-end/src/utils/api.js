@@ -130,7 +130,6 @@ export async function createTable(newTable, signal) {
       signal,
       body: JSON.stringify({ data: newTable }),
     }, [])
-//console.log("api.js createTable response from fetchJson:", response)
     return response
   } catch (error) {
     console.error(error)
@@ -186,7 +185,6 @@ export async function searchByNumber(mobileNumber, signal) {
 
 export async function updateReservation(updatedReservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${updatedReservation.reservation_id}`)
-  console.log("api.js updateReservation url:", url)
   try {
     const response = await fetchJson(url, {
       method: 'PUT',

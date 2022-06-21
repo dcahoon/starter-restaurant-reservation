@@ -38,7 +38,6 @@ describe("US-04 - Seat reservation - E2E", () => {
 
 
     test("filling and submitting form creates a new table", async () => {
-//console.log("*** TEST-04-SUBMIT SUBMITTING FORM CREATES A NEW TABLE...")
       
       const tableName = `#${Date.now().toString(10)}`;
       await page.type("input[name=table_name]", tableName);
@@ -54,14 +53,10 @@ describe("US-04 - Seat reservation - E2E", () => {
         page.waitForNavigation({ waitUntil: "networkidle0" }),
       ]);
 
-//console.log("*** TEST-04-SUBMIT promises returned, taking screenshot...")
-
       await page.screenshot({
         path: ".screenshots/us-04-create-table-submit-after.png",
         fullPage: true,
       });
-
-//console.log("*** TEST-04-SUBMIT expecting page to equal tableName, tableName:", tableName)
 
       await expect(page).toMatch(tableName);
       
@@ -71,7 +66,6 @@ describe("US-04 - Seat reservation - E2E", () => {
 
     test("omitting table_name and submitting does not create a new table", async () => {
   
-console.log("*** TEST-04-OMIT-NAME omitting table_name and submitting does not create a new table...")
       await page.type("input[name=capacity]", "3");
 
       await page.screenshot({
@@ -103,7 +97,6 @@ console.log("*** TEST-04-OMIT-NAME omitting table_name and submitting does not c
         path: ".screenshots/us-04-short-table-name-after.png",
         fullPage: true,
       });
-console.log("TEST-04-SHORT-TABLE-NAME url before checking if test passed:", page.url)
 
       expect(page.url()).toContain("/tables/new");
     });
@@ -185,7 +178,6 @@ console.log("TEST-04-SHORT-TABLE-NAME url before checking if test passed:", page
 
     test("seating reservation at table #1 makes the table occupied", async () => {
 
-console.log("*** TEST - SEATING AT TALBE 1 MAKES THE TABLE OCCUPIED ***")
       await page.waitForSelector('option:not([value=""])');
 
       await page.screenshot({
