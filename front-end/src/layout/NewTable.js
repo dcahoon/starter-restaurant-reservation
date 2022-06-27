@@ -45,13 +45,14 @@ export default function NewTable() {
                 setError(response)
                 return
             } else {
-                history.go(-1)
+                history.push("/")
             }
         } catch (error) {
             setError(error.message)
             return
         }
         
+        history.push("/")
     }
 
     function handleCancel(event) {
@@ -85,9 +86,6 @@ export default function NewTable() {
                         onChange={handleChange}
                         value={formData.capacity}
                     />
-                    <div className="invalid-feedback">
-                        Table name must be 2 characters minimum.
-                    </div>
                 </div>
                 <ErrorAlert error={error} />
                 <label htmlFor="submit">

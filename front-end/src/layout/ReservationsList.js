@@ -39,9 +39,9 @@ export default function ReservationsList({ reservations, cancelReservation }) {
   	))
 
     return (
-        <table className="table table-striped">
+        <table className="table table-dark m-2">
             <thead>
-                <tr className="thead-dark">
+                <tr className="">
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>People</th>

@@ -107,7 +107,7 @@ function Dashboard({ date }) {
 				<button 
 					data-table-id-finish={table.table_id}
 					id={table.table_id} 
-					className="btn btn-primary" 
+					className="" 
 					data-toggle="modal" 
 					data-target="#confirmationModal"
 					onClick={() => unseatTable(table.table_id)}
@@ -119,20 +119,20 @@ function Dashboard({ date }) {
   	))
 
   	return (
-		<main>
-			<h1>Dashboard</h1>
-			<div className="">
-				<h4 className="mb-0">Reservations for {date}</h4>
+		<main className="row col-12 m-0 p-0">
+			<h1 className="row col-12 ml-3">Dashboard</h1>
+			<div>
+				<h4 className="row col-12 ml-3">Reservations for {date}</h4>
 			</div>
 			<ErrorAlert error={error} />
-			<div className="row">
-				<div className="col-9 m-0">
+			<div className="dash-content row">
+				<div className="col-lg-9 col-med-12">
 					<ReservationsList reservations={reservations} cancelReservation={cancelReservation} />
 				</div>
-				<div className="col-3 m-0">
-					<table className="table table-striped">
+				<div className="col-lg-3 col-med-12">
+					<table className="table table-dark m-2">
 						<thead>
-							<tr className="thead-dark">
+							<tr className="">
 								<th>Table Name</th>
 								<th>Capacity</th>
 								<th>Status</th>
