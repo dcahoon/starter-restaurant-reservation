@@ -13,6 +13,8 @@
 ## Technologies
 
   - ### React.js
+    
+    -- Used to create front end of application.
 
   ### Node
 
