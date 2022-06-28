@@ -12,7 +12,7 @@
 
 ## Technologies
 
-  ### React.js
+  - ### React.js
 
   ### Node
 
