@@ -9,7 +9,37 @@ import { Link } from "react-router-dom";
 
 function Menu() {
 	return (
-		<nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+		<nav className="navbar navbar-dark bg-dark p-0 m-0">
+		<Link to="/">
+			<div className="sidebar-brand-text">
+				<span>Periodic Tables</span>
+			</div>
+		</Link>
+		<Link className="nav-link" to="/dashboard">
+			<span className="oi oi-dashboard" />
+			Dashboard
+		</Link>
+		<Link className="nav-link" to="/search">
+			<span className="oi oi-magnifying-glass" />
+			Search
+		</Link>
+		<Link className="nav-link" to="/reservations/new">
+			<span className="oi oi-plus" />
+			New Reservation
+		</Link>
+		<Link className="nav-link" to="/tables/new">
+			<span className="oi oi-layers" />
+			New Table
+		</Link>
+	</nav>
+		
+	);
+}
+
+export default Menu;
+
+/**
+ * <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
 			<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
 				<span className="navbar-toggler-icon"></span>
 			</button>
@@ -20,7 +50,7 @@ function Menu() {
 							<span className="oi oi-dashboard" /> Dashboard
 						</Link>
 					</li>
-					<li class="nav-item">
+					<li className="nav-item">
 						<Link className="nav-link" to="/search">
 							<span className="oi oi-magnifying-glass" /> Search
 						</Link>
@@ -38,11 +68,8 @@ function Menu() {
 				</ul>
 			</div>
 		</nav>
-		
-	);
-}
+ */
 
-export default Menu;
 
 /**
  *       <div className="container-fluid d-flex flex-column p-0">
