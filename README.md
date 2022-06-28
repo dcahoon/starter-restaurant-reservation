@@ -12,19 +12,25 @@
 
 ## Technologies
 
-  - ### React.js
+  ### React.js
     
-    -- Used to create front end of application.
-
-  ### Node
+   <tab> - Used to create the user interface for the application.
 
   ### Express
 
+    - The back end application was built using express.js to handle requests and responses.
+
   ### PostgreSQL
+
+    - The language for CRUD operations with the database.
 
   ### Knex
 
+    - This application uses Knex.js to manage the tables in the database as well as to query the tables from the server.
+
   ### Bootstrap
+
+    - Bootstrap is used in this application for most of the styling of the user interface.
 
 ## Installation instructions
 
