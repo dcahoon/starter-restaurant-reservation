@@ -26,13 +26,13 @@
 
 ## Installation instructions
 
-  > Fork and clone this repository.
-  > Run `cp ./back-end/.env.sample ./back-end/.env`.
-  > Update the `./back-end/.env` file with the connection URL's to your ElephantSQL database instance.
-  > Run `cp ./front-end/.env.sample ./front-end/.env`.
-  > You should not need to make changes to the `./front-end/.env` file unless you want to connect to a backend at a location other than `http://localhost:5000`.
-  > Run `npm install` to install project dependencies.
-  > Run `npm run start:dev` to start your server in development mode.
+  - Fork and clone this repository.
+  - Run `cp ./back-end/.env.sample ./back-end/.env`.
+  - Update the `./back-end/.env` file with the connection URL's to your ElephantSQL database instance.
+  - Run `cp ./front-end/.env.sample ./front-end/.env`.
+  - You should not need to make changes to the `./front-end/.env` file unless you want to connect to a backend at a location other than `http://localhost:5000`.
+  - Run `npm install` to install project dependencies.
+  - Run `npm run start:dev` to start your server in development mode.
 
 
 
