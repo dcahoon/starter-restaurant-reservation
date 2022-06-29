@@ -5,10 +5,12 @@ html {
 
 button {
     border-radius: .2em;
-    background-color: purple;
+    border: none;
+    background-color: #ba09eb;
     color: #fff;
     margin-right: .5em;
     margin-bottom: .5em;
+    
 }
 
 .navbar {

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { useHistory } from "react-router-dom"
 import ErrorAlert from "./ErrorAlert"
+import ReservationForm from "./ReservationForm"
 const { createReservation } = require("../utils/api")
 
 export default function NewReservation() {
@@ -20,7 +21,7 @@ export default function NewReservation() {
     const [formData, setFormData] = useState({ ...initialFormData })
     const [error, setError] = useState(null)
 
-    const handleChange = ({ target }) => {
+    /* const handleChange = ({ target }) => {
 
         setFormData({
             ...formData,
@@ -29,8 +30,8 @@ export default function NewReservation() {
     }
 
     const handleReset = () => {
-
         setFormData({ ...initialFormData })
+        return
     }
 
     async function handleSubmit(event) {
@@ -49,14 +50,22 @@ export default function NewReservation() {
         } catch (error) {
             setError(error.message)
         }
-    }
+ */
+    
 
-    function handleCancel() {
+    /* function handleCancel() {
         history.go(-1)
-    }
+    } */
 
     return (
-        <form className="new-res-form needs-validation" onSubmit={handleSubmit}>
+
+        <ReservationForm formData={initialFormData} reservationIsNew={true} />
+
+    )
+
+}
+
+/* <form className="new-res-form needs-validation" onSubmit={handleSubmit}>
             <h1>New Reservation</h1>
             <div className="form-group">
                 <label htmlFor="first_name">First Name</label>
@@ -157,7 +166,4 @@ export default function NewReservation() {
                     Cancel
                 </button>
             </label>
-        </form>
-    )
-
-}
+        </form> */

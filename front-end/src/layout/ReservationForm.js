@@ -1,106 +1,117 @@
-import React, { useEffect, useState } from "react"
-import { useHistory, useParams } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useHistory } from "react-router-dom"
 import ErrorAlert from "./ErrorAlert"
-import moment from "moment"
-import ReservationForm from "./ReservationForm"
-const { updateReservation, getReservation } = require("../utils/api")
+import { createReservation, updateReservation } from "../utils/api"
 
-export default function EditReservation() {
+export default function ReservationForm ({ reservationIsNew, formData }) {
 
-    const history = useHistory()
-
-    const initialFormData = {
+    /* const initialFormData = {
         first_name: "",
         last_name: "",
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
         people: "",
-        status: "",
-        reservation_id: "",
-    }
+        status: "booked",
+    } */
 
-    const [formData, setFormData] = useState({...initialFormData})
     const [error, setError] = useState(null)
+    const [reservation, setReservation] = useState({ ...formData })
 
-    const { reservation_id } = useParams()
+    const history = useHistory()
 
     useEffect(() => {
+        setReservation({ ...formData })
+    }, [reservationIsNew, formData])
 
-        const abortController = new AbortController()
-
-        async function loadReservationFromApi() {
-            
-            try {
-                const reservationFromApi = await getReservation(reservation_id, abortController.signal)
-                const res = reservationFromApi
-                setFormData({
-                    first_name: res.first_name,
-                    last_name: res.last_name,
-                    mobile_number: res.mobile_number,
-                    reservation_date: moment(res.reservation_date).format('YYYY-MM-DD'),
-                    reservation_time: res.reservation_time,
-                    people: res.people,
-                    status: res.status,
-                    reservation_id: res.reservation_id
-                })
-            } catch (error) {
-                setError(error)
-            }
-
-        }
-
-        loadReservationFromApi()
-        
-        return () => {
-            abortController.abort(); // Cancels any pending request or response
-        }
-
-    }, [reservation_id])
-
-
-
-    /* const handleChange = ({ target }) => {
-        setFormData({
-            ...formData,
+    const handleChange = ({ target }) => {
+        setReservation({
+            ...reservation,
             [target.name]: target.name === "people" ? Number(target.value) : target.value,
         })
     }
 
     const handleReset = () => {
-        setFormData({ ...initialFormData })
+        setReservation({ formData })
     }
 
     async function handleSubmit(event) {
+    
         event.preventDefault()
-        
+
         const abortController = new AbortController()
-        const updatedReservation = { ...formData, reservation_time: formData.reservation_time.slice(0, 5) }
-        try {
-            const response = await updateReservation(updatedReservation, abortController.signal)
-            if (response.message) {
-                setError(response)
-                return
+        
+        if (reservationIsNew) {
+
+            async function createNewReservation() {
+
+                const newReservation = { ...reservation }
+                try {
+                    const response = await createReservation(newReservation, abortController.signal)
+                    if (response.message) {
+                        setError(response)
+                        return
+                    }
+                    history.push(`/dashboard/?date=${reservation.reservation_date}`)
+                } catch (error) {
+                    if (error.name === "AbortError") {
+                        // Ignore `AbortError`
+                        console.log("Aborted")
+                      } else {
+                        throw error
+                      }
+                    setError(error.message)
+                }
+
             }
-            history.push(`/dashboard/?date=${formData.reservation_date}`)
-        } catch (error) {
-            setError(error.message)
+
+            createNewReservation()
+
+            return () => {
+                abortController.abort() // Cancels any pending request or response
+            }
+
+        } else {
+
+            async function updateExistingReservation() {
+
+                const updatedReservation = { 
+                    ...reservation, 
+                    reservation_time: reservation.reservation_time.slice(0, 5)
+                }
+                try {
+                    const response = await updateReservation(updatedReservation, abortController.signal)
+                    if (response.message) {
+                        setError(response)
+                        return
+                    }
+                    history.push(`/dashboard/?date=${updatedReservation.reservation_date}`)
+                } catch (error) {
+                    if (error.name === "AbortError") {
+                        return
+                    } else {
+                        setError(error.message)
+                        throw error
+                    }
+                }
+            }
+
+            updateExistingReservation()
+
+            return () => {
+                abortController.abort(); // Cancels any pending request or response
+            }
+
         }
     }
 
     function handleCancel() {
         history.go(-1)
-    } */
+    }
 
     return (
-        <ReservationForm formData={formData} reservationIsNew={false} />
-    )
 
-}
-
-/**
- * <form className="new-res-form needs-validation" onSubmit={handleSubmit}>
-            <h1>Edit Reservation</h1>
+        <form className="new-res-form needs-validation" onSubmit={handleSubmit}>
             <div className="form-group">
                 <label htmlFor="first_name">First Name</label>
                 <input
@@ -109,7 +120,7 @@ export default function EditReservation() {
                     type="text"
                     name="first_name"
                     onChange={handleChange}
-                    value={formData.first_name}
+                    value={reservation.first_name}
                 />
             </div>
             <div className="form-group">
@@ -120,7 +131,7 @@ export default function EditReservation() {
                     type="text"
                     name="last_name"
                     onChange={handleChange}
-                    value={formData.last_name}
+                    value={reservation.last_name}
                 />
             </div>
             <div className="form-group">
@@ -131,7 +142,7 @@ export default function EditReservation() {
                     type="text"
                     name="mobile_number"
                     onChange={handleChange}
-                    value={formData.mobile_number}
+                    value={reservation.mobile_number}
                 />
             </div>
             <div className="form-group">
@@ -142,18 +153,18 @@ export default function EditReservation() {
                     type="date"
                     name="reservation_date"
                     onChange={handleChange}
-                    value={formData.reservation_date}
+                    value={reservation.reservation_date}
                 />
             </div>
             <div className="form-group">
-               <label htmlFor="reservation_time" className="form-label">Time</label>
-               <input
+                <label htmlFor="reservation_time" className="form-label">Time</label>
+                <input
                     id="reservation_time"
                     className="form-control"
                     type="time"
                     name="reservation_time"
                     onChange={handleChange}
-                    value={formData.reservation_time}
+                    value={reservation.reservation_time}
                 />
             </div>
             <div className="form-group">
@@ -164,7 +175,7 @@ export default function EditReservation() {
                     type="number"
                     name="people"
                     onChange={handleChange}
-                    value={formData.people}
+                    value={reservation.people}
                 />
             </div>
             <ErrorAlert error={error} />
@@ -201,4 +212,7 @@ export default function EditReservation() {
                 </button>
             </label>
         </form>
- */
+
+    )
+
+}
