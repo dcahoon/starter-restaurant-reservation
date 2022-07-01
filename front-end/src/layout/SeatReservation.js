@@ -33,7 +33,6 @@ export default function SeatReservation() {
         } catch (error) {
             setError(error.message)
         }
-
     }
 
     const handleChange = (event) => {
@@ -60,8 +59,10 @@ export default function SeatReservation() {
                 setError(error)
             }
         }
-            loadTablesFromApi()
-   
+        loadTablesFromApi()
+        return () => {
+            abortController.abort()
+        }
     }, [])
     
     // Map out tables from API to populate select

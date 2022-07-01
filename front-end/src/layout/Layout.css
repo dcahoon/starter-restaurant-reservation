@@ -13,12 +13,6 @@ button {
     
 }
 
-.navbar {
-    height: auto;
-    justify-content: left;
-    margin: 0;
-}
-
 .nav-link {
     margin: 0;
     color: #fff;
@@ -41,14 +35,7 @@ button {
     margin: 0;
 }
 
-@media only screen and (min-width: 500px) {
-
-    
-
-}
-
-/* For large screen sizes */
-@media only screen and (min-width: 768px) {
-
-
+.validation-error {
+    color: red;
+    font-size: .9em;
 }

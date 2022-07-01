@@ -2,21 +2,22 @@ import { useState, useEffect } from "react"
 import { useHistory } from "react-router-dom"
 import ErrorAlert from "./ErrorAlert"
 import { createReservation, updateReservation } from "../utils/api"
+const moment = require("moment")
 
 export default function ReservationForm ({ reservationIsNew, formData }) {
 
-    /* const initialFormData = {
+    const validations = {
         first_name: "",
         last_name: "",
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: "",
-        status: "booked",
-    } */
+        people: ""
+    }
 
     const [error, setError] = useState(null)
     const [reservation, setReservation] = useState({ ...formData })
+    const [validationMessages, setValidationMessages] = useState({ ...validations })
 
     const history = useHistory()
 
@@ -29,6 +30,88 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
             ...reservation,
             [target.name]: target.name === "people" ? Number(target.value) : target.value,
         })
+        switch (target.name) {
+            case "first_name":
+                if (target.value.length < 3) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        first_name: "first name too short"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        first_name: "",
+                    })
+                }
+                break
+            case "last_name":
+                if (target.value.length < 3) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        last_name: "last name too short"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        last_name: "",
+                    })
+                }
+                break
+            case "mobile_number":
+                if (target.value.length < 10) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        mobile_number: "Please enter a valid number"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        mobile_number: "",
+                    })
+                }
+                break
+            case "reservation_date":
+                if (moment(target.value).format('dddd') === 'Tuesday'){
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_date: "Restaurant is closed on Tuesdays"
+                    })
+                } else if (moment(reservation.reservation_date) < new Date()) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_date: "Reservation must be for a future date"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_date: "",
+                    })
+                }
+                break
+            case "reservation_time":
+                const openTime = moment("10:30", "HH:mm")
+                const latestResTime = moment("21:30", "HH:mm")
+                const resTime = moment(target.value, "kk:mm", true)
+                if (resTime.isBefore(openTime)) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_time: "Restaurant opens at 10:30"
+                    })
+                } else if (latestResTime.isBefore(resTime)) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_time: "Latest reservation time is 9:30"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        reservation_time: ""
+                    })
+                }
+                break
+            default:
+                break
+            }
     }
 
     const handleReset = () => {
@@ -62,7 +145,6 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                       }
                     setError(error.message)
                 }
-
             }
 
             createNewReservation()
@@ -121,7 +203,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="first_name"
                     onChange={handleChange}
                     value={reservation.first_name}
+                    required
                 />
+                <span className="validation-error">{validationMessages.first_name}</span>
             </div>
             <div className="form-group">
                 <label htmlFor="last_name" className="form-label">Last Name</label>
@@ -132,7 +216,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="last_name"
                     onChange={handleChange}
                     value={reservation.last_name}
+                    required
                 />
+                <span className="validation-error">{validationMessages.last_name}</span>
             </div>
             <div className="form-group">
                 <label htmlFor="mobile_number" className="form-label">Mobile Number</label>
@@ -143,7 +229,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="mobile_number"
                     onChange={handleChange}
                     value={reservation.mobile_number}
+                    required
                 />
+                <span className="validation-error">{validationMessages.mobile_number}</span>
             </div>
             <div className="form-group">
                 <label htmlFor="reservation_date" className="form-label">Date</label>
@@ -154,7 +242,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="reservation_date"
                     onChange={handleChange}
                     value={reservation.reservation_date}
+                    required
                 />
+                <span className="validation-error">{validationMessages.reservation_date}</span>
             </div>
             <div className="form-group">
                 <label htmlFor="reservation_time" className="form-label">Time</label>
@@ -165,7 +255,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="reservation_time"
                     onChange={handleChange}
                     value={reservation.reservation_time}
+                    required
                 />
+                <span className="validation-error">{validationMessages.reservation_time}</span>
             </div>
             <div className="form-group">
                 <label htmlFor="people" className="form-label">Party Size</label>
@@ -176,7 +268,9 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
                     name="people"
                     onChange={handleChange}
                     value={reservation.people}
+                    required
                 />
+                <span className="validation-error">{validationMessages.people}</span>
             </div>
             <ErrorAlert error={error} />
             <label htmlFor="submit" className="form-label">
@@ -214,5 +308,4 @@ export default function ReservationForm ({ reservationIsNew, formData }) {
         </form>
 
     )
-
 }

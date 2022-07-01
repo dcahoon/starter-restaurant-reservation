@@ -53,11 +53,11 @@ async function fetchJson(url, options, onCancel) {
 }
 
 /**
- * Retrieves all existing reservation.
- * @returns {Promise<[reservation]>}
- *  a promise that resolves to a possibly empty array of reservation saved in the database.
+ * 
+ * @param {*} params 
+ * @param {*} signal 
+ * @returns {Promise}
  */
-
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
   Object.entries(params).forEach(([key, value]) =>
@@ -68,6 +68,12 @@ export async function listReservations(params, signal) {
     .then(formatReservationTime);
 }
 
+/**
+ * 
+ * @param {*} reservation_id 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function getReservation(reservation_id, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`)
   try {
@@ -81,14 +87,13 @@ export async function getReservation(reservation_id, signal) {
     console.error(error)
     return error
   }
-  
 }
 
 /**
  * 
  * @param {*} newReservation 
  * @param {*} signal 
- * @returns 
+ * @returns {Object}
  */
 export async function createReservation(newReservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`)
@@ -106,6 +111,11 @@ export async function createReservation(newReservation, signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function listTables(signal) {
   const url = new URL(`${API_BASE_URL}/tables`)
   try {
@@ -121,6 +131,12 @@ export async function listTables(signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} newTable 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function createTable(newTable, signal) {
   const url = new URL(`${API_BASE_URL}/tables`)
   try {
@@ -137,9 +153,15 @@ export async function createTable(newTable, signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} reservationId 
+ * @param {*} tableId 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function seatTable(reservationId, tableId, signal) {
   const url = new URL(`${API_BASE_URL}/tables/${tableId}/seat`)
-  
   try {
     const response = await fetchJson(url, {
       method: 'PUT',
@@ -154,6 +176,11 @@ export async function seatTable(reservationId, tableId, signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} tableId 
+ * @returns {Object}
+ */
 export async function finishTable(tableId) {
   const url = new URL(`${API_BASE_URL}/tables/${tableId}/seat`)
   try {
@@ -168,6 +195,12 @@ export async function finishTable(tableId) {
   }
 }
 
+/**
+ * 
+ * @param {*} mobileNumber 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function searchByNumber(mobileNumber, signal) {
   const url = new URL(`${API_BASE_URL}/reservations?mobile_number=${mobileNumber}`)
   try {
@@ -183,6 +216,12 @@ export async function searchByNumber(mobileNumber, signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} updatedReservation 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function updateReservation(updatedReservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${updatedReservation.reservation_id}`)
   try {
@@ -199,6 +238,13 @@ export async function updateReservation(updatedReservation, signal) {
   }
 }
 
+/**
+ * 
+ * @param {*} reservationId 
+ * @param {*} newStatus 
+ * @param {*} signal 
+ * @returns {Object}
+ */
 export async function updateStatus(reservationId, newStatus, signal) {
   const url = new URL(`${API_BASE_URL}/reservations/${reservationId}/status`)
   try {

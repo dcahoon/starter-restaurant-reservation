@@ -5,35 +5,61 @@ import ErrorAlert from "./ErrorAlert"
 
 export default function NewTable() {
    
-    const history = useHistory()
+    const history = useHistory()  
 
     const initialFormData = {
         table_name: "",
         capacity: 0,
     }
+    
+    const validations = {
+        table_name: "",
+        capacity: "",
+    }
 
     const [error, setError] = useState(null)
     const [formData, setFormData] = useState({ ...initialFormData })
+    const [validationMessages, setValidationMessages] = useState({ ...validations })
 
     const handleChange = ({ target }) => {
         setFormData({
             ...formData,
             [target.name]: target.value,
         })
+        switch (target.name) {
+            case "table_name":
+                if (target.value.length < 2) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        table_name: "Table name must be at least 2 characters",
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        table_name: "",
+                    })
+                }
+                break
+            case "capacity":
+                if (target.value < 1) {
+                    setValidationMessages({
+                        ...validationMessages,
+                        capacity: "Capacity must be at least 1"
+                    })
+                } else {
+                    setValidationMessages({
+                        ...validationMessages,
+                        capacity: "",
+                    })
+                }
+                break
+            default:
+                break
+            }
     }
 
     async function handleSubmit(event) {
         event.preventDefault()
-
-        if (formData.table_name.length < 2) {
-            setError({ message: `Table name must be at least 2 characters` })
-            return
-        }
-
-        if (typeof parseInt(formData.capacity) !== "number") {
-            setError({ message: `Table capacity must be a number` })
-            return
-        }
 
         const abortController = new AbortController()
         const newTable = { ...formData, capacity: parseInt(formData.capacity) }
@@ -75,6 +101,7 @@ export default function NewTable() {
                         value={formData.table_name}
                         required
                     />
+                    <span className="validation-error">{validationMessages.table_name}</span>
                 </div>
                 <div className="form-group">
                     <label htmlFor="capacity">Capacity</label>
@@ -86,6 +113,7 @@ export default function NewTable() {
                         onChange={handleChange}
                         value={formData.capacity}
                     />
+                    <span className="validation-error">{validationMessages.capacity}</span>
                 </div>
                 <ErrorAlert error={error} />
                 <label htmlFor="submit">
