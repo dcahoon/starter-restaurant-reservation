@@ -18,7 +18,7 @@
       
       /dashboard?2022-06-01
 
-    ![Alt text](https://github.com/dcahoon/starter-restaurant-reservation/blob/main/screenshots/dashboard.png)
+    ![Dashboard](/dashboard.png)
 
   ### New Reservation
 
