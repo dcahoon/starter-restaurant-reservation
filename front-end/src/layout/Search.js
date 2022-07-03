@@ -81,7 +81,8 @@ export default function Search() {
     return (
         <div>
             <form>
-                <input 
+                <input
+                    className="m-2"
                     onChange={handleChange} 
                     type="text" 
                     name="mobile_number" 
