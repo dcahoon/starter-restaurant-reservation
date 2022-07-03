@@ -8,6 +8,7 @@
     "url": "https://github.com/Thinkful-Ed/starter-restaurant-reservation"
   },
   "scripts": {
+    "deploy": "concurrently \"git subtree push --prefix back-end heroku-backend main\" \"git subtree push --prefix front-end heroku-frontend main\" ",
     "build": "npm -prefix front-end run build",
     "preinstall": "cd ./back-end && npm install",
     "install": "cd ./front-end && npm install",
