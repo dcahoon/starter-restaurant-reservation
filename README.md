@@ -2,7 +2,7 @@
 
 ## Link
 
-  A link to your live application
+  https://git.heroku.com/rr-capstone-client.git
 
 ## Summary
 
@@ -12,33 +12,37 @@
 
   ### Dashboard
 
-    ![Dashboard](dashboard.png)
-
     The dashboard displays all reservations for the current day as well as a list of all <br>tables. The list of reservations displays detailed information about the <br>reservations and allows you to seat, edit, or cancel reservations. Reservations <br>can be seated at any table with a sufficient capacity. The list of tables on the <br> dashboard displays whether the table is seated and allows the user to finish the <br>reservation and unseat the table.
 
     The dashboard can also be used to view reservations for a different date by adding a query to the end. For example:
       
       /dashboard?2022-06-01
 
-
+  ![Dashboard](/screenshots/dashboard.png)
 
   ### New Reservation
 
     The new reservation page displays a form allowing the user to create a new reservation. The form as well as the API validates the user input and prevents the user from creating reservations for invalid dates and times.
 
+  ![Dashboard](/screenshots/newreservation.png)
+
   ### New Table
 
     The new table page allows the user to create a new table by naming it and setting the seating capacity.
+
+  ![Dashboard](/screenshots/newtable.png)
 
   ### Search
 
     The search page allows the user to search for reservations by mobile number. It displays all reservations matching that number regardless of date or status. The search page also allows the user to cancel or edit reservations listed.
 
+  ![Dashboard](/screenshots/search.png)
+
 ## Technologies
 
   ### React.js
     
-   <tab> - Used to create the user interface for the application.
+    - Used to create the user interface for the application.
 
   ### Express
 
@@ -55,6 +59,10 @@
   ### Bootstrap
 
     - Bootstrap is used in this application for most of the styling of the user interface.
+
+  ### Heroku
+
+    - Used to deploy the front and back end of the project.
 
 ## Installation instructions
 
