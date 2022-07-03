@@ -64,6 +64,14 @@
 
     - Used to deploy the front and back end of the project.
 
+    rr-frontend
+    https://rr-frontend.herokuapp.com/ | https://git.heroku.com/rr-frontend.git
+    git remote add heroku-backend https://git.heroku.com/rr-backend-server.git
+
+    rr-backend-server
+    https://rr-backend-server.herokuapp.com/ | https://git.heroku.com/rr-backend-server.git
+    git remote add heroku-frontend https://git.heroku.com/rr-frontend.git
+
 ## Installation instructions
 
   - Fork and clone this repository.
