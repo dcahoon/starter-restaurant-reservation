@@ -18,7 +18,7 @@
       
       /dashboard?2022-06-01
 
-    ![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+    ![Alt text](/screenshots/dashboard.png?raw=true "Optional Title")
 
   ### New Reservation
 
