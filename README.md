@@ -12,13 +12,13 @@
 
   ### Dashboard
 
-    The dashboard displays all reservations for the current day as well as a list of all tables. The list of reservations displays detailed information about the reservations and allows you to seat, edit, or cancel reservations. Reservations can be seated at any table with a sufficient capacity. The list of tables on the dashboard displays whether the table is seated and allows the user to finish the reservation and unseat the table.
+    The dashboard displays all reservations for the current day as well as a list of all <br>tables. The list of reservations displays detailed information about the <br>reservations and allows you to seat, edit, or cancel reservations. Reservations <br>can be seated at any table with a sufficient capacity. The list of tables on the <br> dashboard displays whether the table is seated and allows the user to finish the <br>reservation and unseat the table.
 
     The dashboard can also be used to view reservations for a different date by adding a query to the end. For example:
       
       /dashboard?2022-06-01
 
-    ![Alt text](/screenshots/dashboard.png?raw=true "Optional Title")
+    ![Alt text](../screenshots/dashboard.png?raw=true "Optional Title")
 
   ### New Reservation
 
