@@ -12,12 +12,7 @@ const tablesRouter = require("./tables/tables.router");
 
 const app = express();
 
-var corsOptions = {
-    origin: 'https://git.heroku.com/rr-frontend.git',
-    optionsSuccessStatus: 200,
-}
-
-app.use(cors(corsOptions));
+app.use();
 app.use(express.json());
 
 app.use("/tables", tablesRouter);
