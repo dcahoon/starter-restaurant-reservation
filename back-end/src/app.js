@@ -12,7 +12,7 @@ const tablesRouter = require("./tables/tables.router");
 
 const app = express();
 
-app.use();
+app.use(cors());
 app.use(express.json());
 
 app.use("/tables", tablesRouter);
