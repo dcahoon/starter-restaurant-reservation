@@ -3,13 +3,10 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary")
 const moment = require("moment") // used to validate date input
 
 async function reservationExists(req, res, next) {
-
   try {
     const reservation = await service.read(req.params.reservation_id)
-
     if (reservation) {
       res.locals.reservation = reservation
-
       next()
     } else {
       next({ status: 404, message: `Reservation ${req.params.reservation_id} not found` })
@@ -46,8 +43,6 @@ const hasMobileNumber = dataHas("mobile_number")
 const hasReservationDate = dataHas("reservation_date")
 const hasReservationTime = dataHas("reservation_time")
 const hasPeople = dataHas("people")
-
-
 
 async function hasBookedStatus (req, res, next) {
   const reservation = res.locals.reservation
@@ -122,14 +117,11 @@ async function read(req, res, next) {
 }
 
 async function list(req, res, next) {
-
   const mobileNumber = req.query.mobile_number
-
   if (mobileNumber) {
     const data = await service.search(mobileNumber)
     res.json({ data })
   }
-
   const date = req.query.date
   if (date) {
     const data = await service.listReservationsByDate(date)
@@ -148,13 +140,11 @@ async function create(req, res, next) {
 }
 
 async function updateReservation(req, res, next) {
-
   // Only "booked" reservations can be updated
   const updatedReservation = req.body.data
   if (updatedReservation.status !== "booked") {
     return next({ status: 400, message: `Status must be "booked" to update reservation` })
   }
-
   try {
     const data = await service.update(updatedReservation)
     const extractedFromArray = data[0]
@@ -162,34 +152,24 @@ async function updateReservation(req, res, next) {
   } catch (error) {
     return next({ status: 400, message: error.message })
   }
-
 }
 
 async function updateStatus(req, res, next) {
-
   const reservation = res.locals.reservation
-
   const newStatus = req.body.data.status
-
   if (reservation.status === "finished") {
     return next({ status: 400, message: `finished reservations cannot be updated` })
   }
-  
   const validStatusList = ["booked", "seated", "finished", "cancelled"]
-
   if (!validStatusList.includes(newStatus)) {
     return next({ status: 400, message: `unknown reservation status` })
   }
-  
   const updatedReservation = {
     ...reservation,
     status: newStatus,
   }
-
   const data = await service.update(updatedReservation)
-
   res.status(200).json( { data: { status: newStatus } } )
-
 }
 
 

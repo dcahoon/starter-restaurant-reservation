@@ -122,7 +122,7 @@ function Dashboard({ date }) {
 		<main className="row col-12 m-0 p-0">
 			<h1 className="row col-12 ml-3">Dashboard</h1>
 			<div>
-				<h4 className="row col-12 ml-3">Reservations for {date}</h4>
+				<h4 className="row col-lg-12 col-12 ml-3">Reservations for {date}</h4>
 			</div>
 			<ErrorAlert error={error} />
 			<div className="dash-content row">

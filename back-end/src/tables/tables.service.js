@@ -27,12 +27,9 @@ function update(updatedTable) {
 }
 
 async function seatTable(updatedTable, updatedReservation) {
-
     let responseTable = {}
-
     try {
         await knex.transaction(async trx => {
-
             responseTable = await knex('tables')
                 .where({ table_name: updatedTable.table_name })
                 .update(updatedTable, "*")
@@ -47,10 +44,9 @@ async function seatTable(updatedTable, updatedReservation) {
     } catch (error) {
         console.error(error)
     }
-
     return responseTable[0]
-
 }
+
 
 module.exports = {
     create,
