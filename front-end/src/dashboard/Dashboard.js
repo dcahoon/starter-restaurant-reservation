@@ -88,7 +88,7 @@ function Dashboard({ date }) {
     }
 
   	const tablesContent = tables.map((table, index) => (  
-		<tr key={index}>
+		<tr key={table.table_name}>
 			<td>{table.table_name}</td>
 			<td>{table.capacity}</td>
 			{ table.reservation_id ? 

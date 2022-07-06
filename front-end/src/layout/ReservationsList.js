@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export default function ReservationsList({ reservations, cancelReservation }) {
 
     const reservationsContent = reservations.map((reservation, index) => (		
-		<tr key={index}>
+		<tr key={reservation.reservation_id}>
 			<td>{reservation.first_name}</td>
 			<td>{reservation.last_name}</td>
 			<td>{reservation.people}</td>

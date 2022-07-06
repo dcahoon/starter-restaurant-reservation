@@ -67,7 +67,7 @@ export default function SeatReservation() {
     
     // Map out tables from API to populate select
     const content = tables.map((table, index) => (
-        <option key={index} value={table.table_id}>{`${table.table_name} - ${table.capacity}`}</option>
+        <option key={table.table_name} value={table.table_id}>{`${table.table_name} - ${table.capacity}`}</option>
     ))
 
     return (
